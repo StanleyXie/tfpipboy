@@ -4,7 +4,8 @@
 *.dll
 *.so
 *.dylib
-tfpipboy
+/tfpipboy
+bin/tfpipboy
 bin/
 dist/
 
@@ -47,7 +48,6 @@ build/
 .DS_Store
 
 # Claude Code
-.CLAUDE/
 
 # tf-pipboy specific (user config directories, not examples)
 /.tfpipboy/
