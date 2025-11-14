@@ -70,12 +70,12 @@ changelog:
 release:
   github:
     owner: StanleyXie
-    name: tf-pipboy
+    name: tfpipboy
   draft: false
   prerelease: auto
   mode: append
   header: |
-    ## tf-pipboy {{ .Tag }}
+    ## tfpipboy {{ .Tag }}
 
     ### Installation
 
@@ -89,14 +89,14 @@ release:
 
     #### Go Install
     ```bash
-    go install github.com/StanleyXie/tf-pipboy/cmd/tfpipboy@{{ .Tag }}
+    go install github.com/StanleyXie/tfpipboy/cmd/tfpipboy@{{ .Tag }}
     ```
   footer: |
-    **Full Changelog**: https://github.com/StanleyXie/tf-pipboy/compare/{{ .PreviousTag }}...{{ .Tag }}
+    **Full Changelog**: https://github.com/StanleyXie/tfpipboy/compare/{{ .PreviousTag }}...{{ .Tag }}
 
 brews:
   - name: tfpipboy
-    homepage: https://github.com/StanleyXie/tf-pipboy
+    homepage: https://github.com/StanleyXie/tfpipboy
     description: "Context-aware Terraform CLI tool with real-time status display"
     license: MIT
     repository:
