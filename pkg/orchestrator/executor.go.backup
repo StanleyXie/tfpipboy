@@ -1,0 +1,502 @@
+package orchestrator
+
+import (
+	"bufio"
+	"context"
+	"fmt"
+	"io"
+	"os"
+	"os/exec"
+	"path/filepath"
+	"strings"
+	"sync"
+	"time"
+)
+
+// TerraformExecutor handles execution of Terraform commands in isolated workspaces
+type TerraformExecutor struct {
+	workspaceManager WorkspaceManager
+	logger           Logger
+	timeout          time.Duration
+	dryRun           bool
+}
+
+// NewTerraformExecutor creates a new Terraform executor
+func NewTerraformExecutor(workspaceManager WorkspaceManager, logger Logger) *TerraformExecutor {
+	return &TerraformExecutor{
+		workspaceManager: workspaceManager,
+		logger:           logger,
+		timeout:          30 * time.Minute,
+		dryRun:           false,
+	}
+}
+
+// SetTimeout sets the execution timeout
+func (e *TerraformExecutor) SetTimeout(timeout time.Duration) {
+	e.timeout = timeout
+}
+
+// SetDryRun sets dry run mode
+func (e *TerraformExecutor) SetDryRun(dryRun bool) {
+	e.dryRun = dryRun
+}
+
+// ExecuteJob executes a single Terraform job
+func (e *TerraformExecutor) ExecuteJob(ctx context.Context, job *ExecutionJob) error {
+	e.logger.Info("Starting job execution", "job_id", job.ID, "module", job.ModuleName, "operation", job.Operation)
+
+	// Update job status
+	job.Status = JobStatusRunning
+	now := time.Now()
+	job.StartTime = &now
+
+	// Get or create workspace
+	workspace, err := e.workspaceManager.GetWorkspace(job.ID)
+	if err != nil {
+		// Try to create workspace if it doesn't exist
+		module, instance, err := e.getModuleAndInstance(job)
+		if err != nil {
+			return e.failJob(job, fmt.Errorf("failed to get module configuration: %w", err))
+		}
+
+		workspace, err = e.workspaceManager.CreateWorkspace(job.ID, module, instance)
+		if err != nil {
+			return e.failJob(job, fmt.Errorf("failed to create workspace: %w", err))
+		}
+	}
+
+	// Execute the operation
+	switch TerraformOperation(job.Operation) {
+	case OpInit:
+		err = e.executeInit(ctx, job, workspace)
+	case OpPlan:
+		err = e.executePlan(ctx, job, workspace)
+	case OpApply:
+		err = e.executeApply(ctx, job, workspace)
+	case OpDestroy:
+		err = e.executeDestroy(ctx, job, workspace)
+	case OpValidate:
+		err = e.executeValidate(ctx, job, workspace)
+	case OpRefresh:
+		err = e.executeRefresh(ctx, job, workspace)
+	case OpOutput:
+		err = e.executeOutput(ctx, job, workspace)
+	default:
+		err = fmt.Errorf("unsupported operation: %s", job.Operation)
+	}
+
+	// Update job completion
+	endTime := time.Now()
+	job.EndTime = &endTime
+	job.Duration = job.EndTime.Sub(*job.StartTime)
+
+	if err != nil {
+		return e.failJob(job, err)
+	}
+
+	job.Status = JobStatusCompleted
+	e.logger.Info("Job completed successfully", "job_id", job.ID, "duration", job.Duration)
+
+	return nil
+}
+
+// executeInit runs terraform init
+func (e *TerraformExecutor) executeInit(ctx context.Context, job *ExecutionJob, workspace *Workspace) error {
+	args := []string{"init"}
+
+	// Add backend configuration
+	if workspace.Backend != nil {
+		backendFile := filepath.Join(workspace.Path, "backend.tf")
+		if _, err := os.Stat(backendFile); err == nil {
+			args = append(args, fmt.Sprintf("-backend-config=%s", backendFile))
+		}
+	}
+
+	// Add upgrade flag for safety
+	args = append(args, "-upgrade")
+
+	return e.runTerraformCommand(ctx, job, workspace, args)
+}
+
+// executePlan runs terraform plan
+func (e *TerraformExecutor) executePlan(ctx context.Context, job *ExecutionJob, workspace *Workspace) error {
+	// Ensure init is run first
+	if err := e.executeInit(ctx, job, workspace); err != nil {
+		return fmt.Errorf("init failed: %w", err)
+	}
+
+	args := []string{"plan"}
+
+	// Add variables
+	if err := e.addVariableArgs(&args, workspace); err != nil {
+		return fmt.Errorf("failed to add variables: %w", err)
+	}
+
+	// Add output format
+	args = append(args, "-detailed-exitcode")
+
+	return e.runTerraformCommand(ctx, job, workspace, args)
+}
+
+// executeApply runs terraform apply
+func (e *TerraformExecutor) executeApply(ctx context.Context, job *ExecutionJob, workspace *Workspace) error {
+	if e.dryRun {
+		e.logger.Info("Dry run mode - skipping apply", "job_id", job.ID)
+		return e.executePlan(ctx, job, workspace)
+	}
+
+	// Ensure init is run first
+	if err := e.executeInit(ctx, job, workspace); err != nil {
+		return fmt.Errorf("init failed: %w", err)
+	}
+
+	args := []string{"apply"}
+
+	// Add auto-approve for non-interactive execution
+	args = append(args, "-auto-approve")
+
+	// Add variables
+	if err := e.addVariableArgs(&args, workspace); err != nil {
+		return fmt.Errorf("failed to add variables: %w", err)
+	}
+
+	return e.runTerraformCommand(ctx, job, workspace, args)
+}
+
+// executeDestroy runs terraform destroy
+func (e *TerraformExecutor) executeDestroy(ctx context.Context, job *ExecutionJob, workspace *Workspace) error {
+	if e.dryRun {
+		e.logger.Info("Dry run mode - skipping destroy", "job_id", job.ID)
+		// Run plan with destroy flag instead
+		return e.executeDestroyPlan(ctx, job, workspace)
+	}
+
+	// Ensure init is run first
+	if err := e.executeInit(ctx, job, workspace); err != nil {
+		return fmt.Errorf("init failed: %w", err)
+	}
+
+	args := []string{"destroy"}
+
+	// Add auto-approve for non-interactive execution
+	args = append(args, "-auto-approve")
+
+	// Add variables
+	if err := e.addVariableArgs(&args, workspace); err != nil {
+		return fmt.Errorf("failed to add variables: %w", err)
+	}
+
+	return e.runTerraformCommand(ctx, job, workspace, args)
+}
+
+// executeDestroyPlan runs terraform plan -destroy
+func (e *TerraformExecutor) executeDestroyPlan(ctx context.Context, job *ExecutionJob, workspace *Workspace) error {
+	// Ensure init is run first
+	if err := e.executeInit(ctx, job, workspace); err != nil {
+		return fmt.Errorf("init failed: %w", err)
+	}
+
+	args := []string{"plan", "-destroy"}
+
+	// Add variables
+	if err := e.addVariableArgs(&args, workspace); err != nil {
+		return fmt.Errorf("failed to add variables: %w", err)
+	}
+
+	return e.runTerraformCommand(ctx, job, workspace, args)
+}
+
+// executeValidate runs terraform validate
+func (e *TerraformExecutor) executeValidate(ctx context.Context, job *ExecutionJob, workspace *Workspace) error {
+	// Ensure init is run first
+	if err := e.executeInit(ctx, job, workspace); err != nil {
+		return fmt.Errorf("init failed: %w", err)
+	}
+
+	args := []string{"validate"}
+	args = append(args, "-json") // Get JSON output for better parsing
+
+	return e.runTerraformCommand(ctx, job, workspace, args)
+}
+
+// executeRefresh runs terraform refresh
+func (e *TerraformExecutor) executeRefresh(ctx context.Context, job *ExecutionJob, workspace *Workspace) error {
+	// Ensure init is run first
+	if err := e.executeInit(ctx, job, workspace); err != nil {
+		return fmt.Errorf("init failed: %w", err)
+	}
+
+	args := []string{"refresh"]
+
+	// Add variables
+	if err := e.addVariableArgs(&args, workspace); err != nil {
+		return fmt.Errorf("failed to add variables: %w", err)
+	}
+
+	return e.runTerraformCommand(ctx, job, workspace, args)
+}
+
+// executeOutput runs terraform output
+func (e *TerraformExecutor) executeOutput(ctx context.Context, job *ExecutionJob, workspace *Workspace) error {
+	args := []string{"output", "-json"}
+
+	return e.runTerraformCommand(ctx, job, workspace, args)
+}
+
+// addVariableArgs adds variable arguments to terraform command
+func (e *TerraformExecutor) addVariableArgs(args *[]string, workspace *Workspace) error {
+	// Add tfvars file if it exists
+	tfvarsFile := filepath.Join(workspace.Path, "terraform.tfvars")
+	if _, err := os.Stat(tfvarsFile); err == nil {
+		*args = append(*args, fmt.Sprintf("-var-file=%s", tfvarsFile))
+	}
+
+	// Add individual variables
+	for key, value := range workspace.Variables {
+		*args = append(*args, fmt.Sprintf("-var=%s=%s", key, value))
+	}
+
+	return nil
+}
+
+// runTerraformCommand executes a terraform command with proper isolation
+func (e *TerraformExecutor) runTerraformCommand(ctx context.Context, job *ExecutionJob, workspace *Workspace, args []string) error {
+	// Create context with timeout
+	cmdCtx, cancel := context.WithTimeout(ctx, e.timeout)
+	defer cancel()
+
+	// Create the command
+	cmd := exec.CommandContext(cmdCtx, "terraform", args...)
+
+	// Set working directory to the module path
+	cmd.Dir = workspace.ModulePath
+
+	// Set environment variables
+	env := e.buildEnvironment(workspace)
+	cmd.Env = env
+
+	// Create pipes for stdout and stderr
+	stdout, err := cmd.StdoutPipe()
+	if err != nil {
+		return fmt.Errorf("failed to create stdout pipe: %w", err)
+	}
+
+	stderr, err := cmd.StderrPipe()
+	if err != nil {
+		return fmt.Errorf("failed to create stderr pipe: %w", err)
+	}
+
+	e.logger.Info("Executing terraform command",
+		"job_id", job.ID,
+		"command", fmt.Sprintf("terraform %s", strings.Join(args, " ")),
+		"working_dir", cmd.Dir,
+	)
+
+	// Start the command
+	if err := cmd.Start(); err != nil {
+		return fmt.Errorf("failed to start terraform command: %w", err)
+	}
+
+	// Capture output
+	var outputBuilder strings.Builder
+	var wg sync.WaitGroup
+
+	// Read stdout
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		e.streamOutput(stdout, &outputBuilder, "STDOUT", job.ID)
+	}()
+
+	// Read stderr
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		e.streamOutput(stderr, &outputBuilder, "STDERR", job.ID)
+	}()
+
+	// Wait for command to complete
+	err = cmd.Wait()
+	wg.Wait()
+
+	// Store output
+	job.Output = outputBuilder.String()
+
+	if err != nil {
+		// Check if it's a context cancellation
+		if cmdCtx.Err() == context.DeadlineExceeded {
+			return fmt.Errorf("terraform command timed out after %v", e.timeout)
+		}
+		if cmdCtx.Err() == context.Canceled {
+			return fmt.Errorf("terraform command was cancelled")
+		}
+
+		return fmt.Errorf("terraform command failed: %w", err)
+	}
+
+	return nil
+}
+
+// streamOutput streams command output and logs it
+func (e *TerraformExecutor) streamOutput(reader io.Reader, builder *strings.Builder, prefix, jobID string) {
+	scanner := bufio.NewScanner(reader)
+	for scanner.Scan() {
+		line := scanner.Text()
+
+		// Write to output builder
+		builder.WriteString(line)
+		builder.WriteString("\n")
+
+		// Log the line
+		e.logger.Debug("Command output",
+			"job_id", jobID,
+			"stream", prefix,
+			"line", line,
+		)
+	}
+}
+
+// buildEnvironment builds the environment variables for terraform execution
+func (e *TerraformExecutor) buildEnvironment(workspace *Workspace) []string {
+	var env []string
+
+	// Get workspace environment
+	workspaceEnv := workspace.Environment
+
+	// Add TF_DATA_DIR pointing to workspace
+	workspaceEnv["TF_DATA_DIR"] = filepath.Join(workspace.Path, ".terraform")
+
+	// Convert to slice format
+	for key, value := range workspaceEnv {
+		env = append(env, fmt.Sprintf("%s=%s", key, value))
+	}
+
+	return env
+}
+
+// getModuleAndInstance retrieves module and instance configuration for a job
+func (e *TerraformExecutor) getModuleAndInstance(job *ExecutionJob) (*Module, *Instance, error) {
+	// This would typically be provided by the orchestrator
+	// For now, return nil - the caller should provide this information
+	return nil, nil, fmt.Errorf("module configuration not available")
+}
+
+// failJob marks a job as failed and logs the error
+func (e *TerraformExecutor) failJob(job *ExecutionJob, err error) error {
+	job.Status = JobStatusFailed
+	job.Error = err.Error()
+
+	endTime := time.Now()
+	job.EndTime = &endTime
+
+	if job.StartTime != nil {
+		job.Duration = endTime.Sub(*job.StartTime)
+	}
+
+	e.logger.Error("Job failed",
+		"job_id", job.ID,
+		"module", job.ModuleName,
+		"operation", job.Operation,
+		"error", err.Error(),
+		"duration", job.Duration,
+	)
+
+	return err
+}
+
+// ExecuteJobWithWorkspace executes a job with a pre-configured workspace
+func (e *TerraformExecutor) ExecuteJobWithWorkspace(ctx context.Context, job *ExecutionJob, module *Module, instance *Instance) error {
+	// Create workspace for this job
+	workspace, err := e.workspaceManager.CreateWorkspace(job.ID, module, instance)
+	if err != nil {
+		return e.failJob(job, fmt.Errorf("failed to create workspace: %w", err))
+	}
+
+	// Execute the job
+	return e.ExecuteJob(ctx, job)
+}
+
+// ParallelExecutor handles parallel execution of multiple jobs
+type ParallelExecutor struct {
+	executor      *TerraformExecutor
+	maxConcurrent int
+	logger        Logger
+}
+
+// NewParallelExecutor creates a new parallel executor
+func NewParallelExecutor(executor *TerraformExecutor, maxConcurrent int, logger Logger) *ParallelExecutor {
+	return &ParallelExecutor{
+		executor:      executor,
+		maxConcurrent: maxConcurrent,
+		logger:        logger,
+	}
+}
+
+// ExecuteJobs executes multiple jobs in parallel with concurrency control
+func (pe *ParallelExecutor) ExecuteJobs(ctx context.Context, jobs []*ExecutionJob, modules map[string]*Module) *ExecutionResult {
+	result := &ExecutionResult{
+		TotalJobs: len(jobs),
+		Jobs:      jobs,
+		Outputs:   make(map[string]interface{}),
+		StartTime: time.Now(),
+	}
+
+	// Create semaphore for concurrency control
+	semaphore := make(chan struct{}, pe.maxConcurrent)
+	var wg sync.WaitGroup
+
+	// Execute jobs
+	for _, job := range jobs {
+		wg.Add(1)
+		go func(j *ExecutionJob) {
+			defer wg.Done()
+
+			// Acquire semaphore
+			semaphore <- struct{}{}
+			defer func() { <-semaphore }()
+
+			// Get module configuration
+			module := modules[j.ModuleName]
+			var instance *Instance
+			if j.InstanceName != "" && module != nil {
+				instance = module.Instances[j.InstanceName]
+			}
+
+			// Execute job
+			if err := pe.executor.ExecuteJobWithWorkspace(ctx, j, module, instance); err != nil {
+				pe.logger.Error("Job execution failed", "job_id", j.ID, "error", err)
+			}
+		}(job)
+	}
+
+	// Wait for all jobs to complete
+	wg.Wait()
+
+	// Calculate results
+	result.EndTime = time.Now()
+	result.Duration = result.EndTime.Sub(result.StartTime)
+
+	for _, job := range jobs {
+		switch job.Status {
+		case JobStatusCompleted:
+			result.Completed++
+		case JobStatusFailed:
+			result.Failed++
+			result.Errors = append(result.Errors, job.Error)
+		case JobStatusSkipped:
+			result.Skipped++
+		}
+	}
+
+	result.Success = result.Failed == 0
+
+	pe.logger.Info("Parallel execution completed",
+		"total", result.TotalJobs,
+		"completed", result.Completed,
+		"failed", result.Failed,
+		"skipped", result.Skipped,
+		"duration", result.Duration,
+	)
+
+	return result
+}

@@ -1,0 +1,113 @@
+project_name: tfpipboy
+
+before:
+  hooks:
+    - go mod tidy
+    - go generate ./...
+
+builds:
+  - main: ./cmd/tfpipboy/main.go
+    binary: tfpipboy
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w
+      - -X main.version={{.Version}}
+      - -X main.commit={{.Commit}}
+      - -X main.date={{.Date}}
+
+archives:
+  - format: tar.gz
+    name_template: >-
+      {{ .ProjectName }}_
+      {{- title .Os }}_
+      {{- if eq .Arch "amd64" }}x86_64
+      {{- else if eq .Arch "386" }}i386
+      {{- else }}{{ .Arch }}{{ end }}
+      {{- if .Arm }}v{{ .Arm }}{{ end }}
+    format_overrides:
+      - goos: windows
+        format: zip
+    files:
+      - README.md
+      - LICENSE
+      - CHANGELOG.md
+
+checksum:
+  name_template: "checksums.txt"
+
+snapshot:
+  name_template: "{{ incpatch .Version }}-next"
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+      - "^chore:"
+      - "merge conflict"
+      - Merge pull request
+      - Merge remote-tracking branch
+      - Merge branch
+  groups:
+    - title: Features
+      regexp: "^feat.*:"
+      order: 0
+    - title: Bug Fixes
+      regexp: "^fix.*:"
+      order: 1
+    - title: Others
+      order: 999
+
+release:
+  github:
+    owner: StanleyXie
+    name: tf-pipboy
+  draft: false
+  prerelease: auto
+  mode: append
+  header: |
+    ## tf-pipboy {{ .Tag }}
+
+    ### Installation
+
+    #### Homebrew (macOS/Linux)
+    ```bash
+    brew install stanleyxie/tap/tfpipboy
+    ```
+
+    #### Binary Download
+    Download the appropriate binary for your platform from the assets below.
+
+    #### Go Install
+    ```bash
+    go install github.com/StanleyXie/tf-pipboy/cmd/tfpipboy@{{ .Tag }}
+    ```
+  footer: |
+    **Full Changelog**: https://github.com/StanleyXie/tf-pipboy/compare/{{ .PreviousTag }}...{{ .Tag }}
+
+brews:
+  - name: tfpipboy
+    homepage: https://github.com/StanleyXie/tf-pipboy
+    description: "Context-aware Terraform CLI tool with real-time status display"
+    license: MIT
+    repository:
+      owner: StanleyXie
+      name: homebrew-tap
+      token: "{{ .Env.GITHUB_TOKEN }}"
+    commit_author:
+      name: goreleaserbot
+      email: bot@goreleaser.com
+    folder: Formula
+    install: |
+      bin.install "tfpipboy"
+    test: |
+      system "#{bin}/tfpipboy", "--version"
