@@ -31,14 +31,14 @@ func NewDefaultWorkspaceManager(baseDir string) *DefaultWorkspaceManager {
 func (wm *DefaultWorkspaceManager) CreateWorkspace(jobID string, module *Module, instance *Instance) (*Workspace, error) {
 	// Create unique workspace directory
 	workspaceDir := filepath.Join(wm.tempDir, jobID)
-	if err := os.MkdirAll(workspaceDir, 0755); err != nil {
+	if err := os.MkdirAll(workspaceDir, 0750); err != nil {
 		return nil, fmt.Errorf("failed to create workspace directory: %w", err)
 	}
 
 	// Create persistent logs directory (outside workspace, so it persists after cleanup)
 	logsBaseDir := filepath.Join(filepath.Dir(wm.tempDir), "logs")
 	logDir := filepath.Join(logsBaseDir, jobID)
-	if err := os.MkdirAll(logDir, 0755); err != nil {
+	if err := os.MkdirAll(logDir, 0750); err != nil {
 		return nil, fmt.Errorf("failed to create logs directory: %w", err)
 	}
 
@@ -152,7 +152,7 @@ func (wm *DefaultWorkspaceManager) setupBackend(workspace *Workspace, module *Mo
 		return nil
 	}
 
-	if err := os.WriteFile(backendFile, []byte(backendContent), 0644); err != nil {
+	if err := os.WriteFile(backendFile, []byte(backendContent), 0600); err != nil {
 		return fmt.Errorf("failed to write backend config: %w", err)
 	}
 
@@ -288,7 +288,7 @@ func (wm *DefaultWorkspaceManager) copyBackendFile(srcFile, destDir string) erro
 
 	// Write to workspace as backend.hcl (for use with -backend-config flag)
 	destFile := filepath.Join(destDir, "backend.hcl")
-	if err := os.WriteFile(destFile, data, 0644); err != nil {
+	if err := os.WriteFile(destFile, data, 0600); err != nil{
 		return fmt.Errorf("failed to write backend file: %w", err)
 	}
 
@@ -410,7 +410,7 @@ func (wm *DefaultWorkspaceManager) copyVariablesFile(srcFile, destDir string, id
 	}
 
 	// Write to workspace
-	if err := os.WriteFile(destFile, data, 0644); err != nil {
+	if err := os.WriteFile(destFile, data, 0600); err != nil {
 		return "", fmt.Errorf("failed to write variables file: %w", err)
 	}
 
@@ -434,7 +434,7 @@ func (wm *DefaultWorkspaceManager) createTfvarsFile(workspace *Workspace) error 
 	}
 
 	tfvarsFile := filepath.Join(workspace.Path, "terraform.tfvars")
-	if err := os.WriteFile(tfvarsFile, []byte(builder.String()), 0644); err != nil {
+	if err := os.WriteFile(tfvarsFile, []byte(builder.String()), 0600); err != nil {
 		return fmt.Errorf("failed to write tfvars file: %w", err)
 	}
 

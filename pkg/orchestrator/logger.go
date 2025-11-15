@@ -52,7 +52,7 @@ func NewDefaultLogger(level LogLevel) *DefaultLogger {
 
 // NewFileLogger creates a new logger that writes to a file
 func NewFileLogger(level LogLevel, filename string) (*DefaultLogger, error) {
-	file, err := os.OpenFile(filename, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+	file, err := os.OpenFile(filename, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0600)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open log file: %w", err)
 	}

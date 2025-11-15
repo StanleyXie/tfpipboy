@@ -43,7 +43,7 @@ func NewTerraformOutputFilter(instanceID string, operation TerraformOperation) *
 // ProcessLine processes a single line of terraform output
 func (f *TerraformOutputFilter) ProcessLine(line string) {
 	// Debug: write lines to file to see what's actually being processed
-	debugFile, err := os.OpenFile("/tmp/tfpipboy-filter-debug.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	debugFile, err := os.OpenFile("/tmp/tfpipboy-filter-debug.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0600)
 	if err == nil {
 		fmt.Fprintf(debugFile, "[%s] LINE: %q\n", f.instanceID, line)
 		debugFile.Close()
@@ -52,7 +52,7 @@ func (f *TerraformOutputFilter) ProcessLine(line string) {
 	// Extract backend information
 	if strings.Contains(line, "Initializing the backend") {
 		f.backend = "Remote backend"
-		if debugFile, _ := os.OpenFile("/tmp/tfpipboy-filter-debug.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644); debugFile != nil {
+		if debugFile, _ := os.OpenFile("/tmp/tfpipboy-filter-debug.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0600); debugFile != nil {
 			fmt.Fprintf(debugFile, "[%s] MATCHED: backend\n", f.instanceID)
 			debugFile.Close()
 		}
@@ -65,7 +65,7 @@ func (f *TerraformOutputFilter) ProcessLine(line string) {
 		provider := extractProvider(line)
 		if provider != "" && !containsString(f.providers, provider) {
 			f.providers = append(f.providers, provider)
-			if debugFile, _ := os.OpenFile("/tmp/tfpipboy-filter-debug.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644); debugFile != nil {
+			if debugFile, _ := os.OpenFile("/tmp/tfpipboy-filter-debug.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0600); debugFile != nil {
 				fmt.Fprintf(debugFile, "[%s] MATCHED: provider=%s\n", f.instanceID, provider)
 				debugFile.Close()
 			}
@@ -75,7 +75,7 @@ func (f *TerraformOutputFilter) ProcessLine(line string) {
 	// Extract initialization result
 	if strings.Contains(line, "Terraform has been successfully initialized") {
 		f.initResult = "✓ Successfully initialized"
-		if debugFile, _ := os.OpenFile("/tmp/tfpipboy-filter-debug.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644); debugFile != nil {
+		if debugFile, _ := os.OpenFile("/tmp/tfpipboy-filter-debug.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0600); debugFile != nil {
 			fmt.Fprintf(debugFile, "[%s] MATCHED: init success\n", f.instanceID)
 			debugFile.Close()
 		}
@@ -96,7 +96,7 @@ func (f *TerraformOutputFilter) ProcessLine(line string) {
 	// Extract "No changes" message (match with or without ".")
 	if strings.Contains(line, "No changes") && strings.Contains(line, "infrastructure matches") {
 		f.planChanges.Summary = "No changes"
-		if debugFile, _ := os.OpenFile("/tmp/tfpipboy-filter-debug.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644); debugFile != nil {
+		if debugFile, _ := os.OpenFile("/tmp/tfpipboy-filter-debug.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0600); debugFile != nil {
 			fmt.Fprintf(debugFile, "[%s] MATCHED: no changes\n", f.instanceID)
 			debugFile.Close()
 		}
@@ -136,7 +136,7 @@ func (f *TerraformOutputFilter) ProcessLine(line string) {
 		formatted := fmt.Sprintf("%s %s", symbol, resourceLine)
 		f.planChanges.Details = append(f.planChanges.Details, formatted)
 
-		if debugFile, _ := os.OpenFile("/tmp/tfpipboy-filter-debug.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644); debugFile != nil {
+		if debugFile, _ := os.OpenFile("/tmp/tfpipboy-filter-debug.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0600); debugFile != nil {
 			fmt.Fprintf(debugFile, "[%s] MATCHED RESOURCE CHANGE: %s\n", f.instanceID, formatted)
 			debugFile.Close()
 		}

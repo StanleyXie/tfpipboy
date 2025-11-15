@@ -1352,7 +1352,7 @@ func (e *TerraformExecutor) saveJobMetadata(job *ExecutionJob, workspace *Worksp
 		return
 	}
 
-	if err := os.WriteFile(metadataFile, data, 0644); err != nil {
+	if err := os.WriteFile(metadataFile, data, 0600); err != nil {
 		e.logger.Warn("Failed to write job metadata", "job_id", job.ID, "error", err)
 		return
 	}
@@ -1445,7 +1445,7 @@ func (e *TerraformExecutor) savePlanJSON(ctx context.Context, job *ExecutionJob,
 	}
 
 	// Save JSON output
-	if err := os.WriteFile(outputFile, output, 0644); err != nil {
+	if err := os.WriteFile(outputFile, output, 0600); err != nil {
 		e.logger.Warn("Failed to write plan JSON file", "job_id", job.ID, "error", err)
 		return err
 	}
@@ -1471,7 +1471,7 @@ func (e *TerraformExecutor) savePlanText(ctx context.Context, job *ExecutionJob,
 	cleanOutput := StripANSI(string(output))
 
 	// Save text output
-	if err := os.WriteFile(outputFile, []byte(cleanOutput), 0644); err != nil {
+	if err := os.WriteFile(outputFile, []byte(cleanOutput), 0600); err != nil {
 		e.logger.Warn("Failed to write plan text file", "job_id", job.ID, "error", err)
 		return err
 	}

@@ -1,11 +1,14 @@
 package cli
 
 import (
+	"bufio"
+	"context"
 	"fmt"
 	"io"
 	"os"
 	"os/exec"
 	"os/signal"
+	"path/filepath"
 	"strings"
 	"syscall"
 	"time"
@@ -13,6 +16,7 @@ import (
 
 	"github.com/StanleyXie/tfpipboy/pkg/auth"
 	"github.com/StanleyXie/tfpipboy/pkg/terraform"
+	"github.com/StanleyXie/tfpipboy/pkg/version"
 	"github.com/ergochat/readline"
 )
 
@@ -34,16 +38,29 @@ const (
 	clearLine     = "\033[2K"   // Clear entire line
 	hideCursor    = "\033[?25l" // Hide cursor
 	showCursor    = "\033[?25h" // Show cursor
+
+	// Security and performance settings
+	maxHistoryLines      = 10000            // Maximum lines in history file to prevent unbounded growth
+	historyFileMode      = 0600             // User read/write only for security
+	defaultCommandTimeout = 30 * time.Minute // Default timeout for command execution
 )
 
 // Wrapper is the main CLI wrapper structure
+// SECURITY NOTE: This wrapper executes user commands directly through the shell.
+// By design, it provides full shell access to the authenticated user.
+// - Commands are executed with the user's own permissions and credentials
+// - All environment variables are inherited by child processes
+// - Command history is stored locally (see history file security below)
+// This is intended for interactive use by trusted operators, not for programmatic/automated use.
 type Wrapper struct {
 	authManager    *auth.Manager
 	tfManager      *terraform.Manager
 	commandHistory []string
 	historyIndex   int
+	historyFile    string
 	termHeight     int
 	termWidth      int
+	commandTimeout time.Duration
 }
 
 // NewWrapper creates a new CLI wrapper instance
@@ -53,11 +70,98 @@ func NewWrapper() *Wrapper {
 		tfManager:      terraform.NewManager(),
 		commandHistory: []string{},
 		historyIndex:   0,
+		historyFile:    os.ExpandEnv("$HOME/.tfpipboy_history"),
+		commandTimeout: defaultCommandTimeout,
 	}
+}
+
+// setupHistoryFile ensures history file exists with proper permissions and size limits
+// SECURITY: History file set to 0600 (user read/write only) to protect potentially sensitive commands
+func (w *Wrapper) setupHistoryFile() error {
+	// Ensure history file exists
+	if _, err := os.Stat(w.historyFile); os.IsNotExist(err) {
+		// Create empty file with secure permissions
+		f, err := os.OpenFile(w.historyFile, os.O_CREATE|os.O_WRONLY, historyFileMode)
+		if err != nil {
+			return fmt.Errorf("failed to create history file: %w", err)
+		}
+		f.Close()
+	} else {
+		// File exists, ensure permissions are correct
+		if err := os.Chmod(w.historyFile, historyFileMode); err != nil {
+			return fmt.Errorf("failed to set history file permissions: %w", err)
+		}
+	}
+
+	// Trim history file if too large
+	return w.trimHistoryFile()
+}
+
+// trimHistoryFile limits history file to maxHistoryLines to prevent unbounded growth
+func (w *Wrapper) trimHistoryFile() error {
+	file, err := os.Open(w.historyFile)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return nil // No file to trim
+		}
+		return fmt.Errorf("failed to open history file: %w", err)
+	}
+	defer file.Close()
+
+	// Read all lines
+	var lines []string
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		lines = append(lines, scanner.Text())
+	}
+
+	if err := scanner.Err(); err != nil {
+		return fmt.Errorf("failed to read history file: %w", err)
+	}
+
+	// Trim if necessary
+	if len(lines) > maxHistoryLines {
+		lines = lines[len(lines)-maxHistoryLines:]
+
+		// Write back trimmed history
+		tmpFile := w.historyFile + ".tmp"
+		f, err := os.OpenFile(tmpFile, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, historyFileMode)
+		if err != nil {
+			return fmt.Errorf("failed to create temp history file: %w", err)
+		}
+
+		writer := bufio.NewWriter(f)
+		for _, line := range lines {
+			fmt.Fprintln(writer, line)
+		}
+
+		if err := writer.Flush(); err != nil {
+			f.Close()
+			return fmt.Errorf("failed to write history file: %w", err)
+		}
+
+		if err := f.Close(); err != nil {
+			return fmt.Errorf("failed to close history file: %w", err)
+		}
+
+		// Atomic replace
+		if err := os.Rename(tmpFile, w.historyFile); err != nil {
+			return fmt.Errorf("failed to replace history file: %w", err)
+		}
+	}
+
+	return nil
 }
 
 // Run starts the CLI wrapper main loop
 func (w *Wrapper) Run() error {
+	// Setup history file with security settings
+	if err := w.setupHistoryFile(); err != nil {
+		fmt.Printf("Warning: Failed to setup history file: %v\n", err)
+		// Continue without history file
+		w.historyFile = ""
+	}
+
 	// Print initial header
 	w.printWelcome()
 	w.printStatus()
@@ -65,7 +169,7 @@ func (w *Wrapper) Run() error {
 	// Create readline instance with configuration
 	rl, err := readline.NewEx(&readline.Config{
 		Prompt:          w.buildPrompt(),
-		HistoryFile:     os.ExpandEnv("$HOME/.tfpipboy_history"),
+		HistoryFile:     w.historyFile,
 		AutoComplete:    w.buildCompleter(),
 		InterruptPrompt: "^C",
 		EOFPrompt:       "exit",
@@ -138,8 +242,8 @@ func (w *Wrapper) Run() error {
 func (w *Wrapper) printWelcome() {
 	clearScreen()
 	fmt.Printf("%s╭────────────────────────────────────────────────────────────────────╮%s\n", colorCyan, colorReset)
-	fmt.Printf("%s│%s                        %stfpipboy v0.2.0%s                            %s│%s\n",
-		colorCyan, colorReset, colorBold+colorYellow, colorReset, colorCyan, colorReset)
+	fmt.Printf("%s│%s                        %stfpipboy v%s%s                            %s│%s\n",
+		colorCyan, colorReset, colorBold+colorYellow, version.Version, colorReset, colorCyan, colorReset)
 	fmt.Printf("%s│%s                    %sCLI Wrapper for Terraform%s                       %s│%s\n",
 		colorCyan, colorReset, colorWhite, colorReset, colorCyan, colorReset)
 	fmt.Printf("%s╰────────────────────────────────────────────────────────────────────╯%s\n", colorCyan, colorReset)
@@ -235,7 +339,7 @@ func (w *Wrapper) handleBuiltinCommand(command string) bool {
 	}
 }
 
-// handleCD handles directory change
+// handleCD handles directory change with path validation
 func (w *Wrapper) handleCD(parts []string) {
 	var dir string
 
@@ -247,40 +351,88 @@ func (w *Wrapper) handleCD(parts []string) {
 
 	// Expand ~
 	if strings.HasPrefix(dir, "~") {
-		dir = strings.Replace(dir, "~", os.Getenv("HOME"), 1)
+		home := os.Getenv("HOME")
+		if home == "" {
+			fmt.Printf("\033[31mcd: HOME environment variable not set\033[0m\n")
+			return
+		}
+		dir = strings.Replace(dir, "~", home, 1)
+	}
+
+	// Clean and validate path
+	dir = filepath.Clean(dir)
+
+	// Convert to absolute path if not already
+	if !filepath.IsAbs(dir) {
+		cwd, err := os.Getwd()
+		if err != nil {
+			fmt.Printf("\033[31mcd: failed to get current directory: %v\033[0m\n", err)
+			return
+		}
+		dir = filepath.Join(cwd, dir)
+	}
+
+	// Evaluate symlinks for canonical path
+	absDir, err := filepath.EvalSymlinks(dir)
+	if err != nil {
+		// If symlink evaluation fails, try without it (might be valid path)
+		absDir = dir
 	}
 
 	// Change directory
-	if err := os.Chdir(dir); err != nil {
+	if err := os.Chdir(absDir); err != nil {
 		fmt.Printf("\033[31mcd: %v\033[0m\n", err)
 		return
 	}
 
-	// Update terraform manager path
-	// Status will be updated by main loop after this returns
-	newPath, _ := os.Getwd()
+	// Update terraform manager path with the actual directory we changed to
+	newPath, err := os.Getwd()
+	if err != nil {
+		fmt.Printf("\033[33mWarning: failed to update terraform context: %v\033[0m\n", err)
+		return
+	}
 	w.tfManager.SetPath(newPath)
 }
 
 // runExternalCommand runs an external command with full terminal access
+// SECURITY: This function executes user-provided commands through the shell.
+// - Commands run with the user's own permissions (not elevated)
+// - Full environment is inherited (including credentials in env vars)
+// - Timeout applied to prevent indefinite hangs
+// - Interactive commands (terraform apply, etc.) work correctly
 func (w *Wrapper) runExternalCommand(command string) {
 	shell := os.Getenv("SHELL")
 	if shell == "" {
 		shell = "/bin/sh"
 	}
 
-	cmd := exec.Command(shell, "-c", command)
-	cmd.Dir, _ = os.Getwd()
+	// Create context with timeout to prevent indefinite hangs
+	ctx, cancel := context.WithTimeout(context.Background(), w.commandTimeout)
+	defer cancel()
+
+	cmd := exec.CommandContext(ctx, shell, "-c", command)
+	cwd, err := os.Getwd()
+	if err != nil {
+		fmt.Printf("\n\033[31m[Error: failed to get working directory: %v]\033[0m\n", err)
+		return
+	}
+	cmd.Dir = cwd
 	cmd.Env = os.Environ()
 
-	// Connect directly to terminal for real-time output
+	// Connect directly to terminal for real-time output and interactivity
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 
 	// Run and wait
 	if err := cmd.Run(); err != nil {
-		fmt.Printf("\n\033[31m[Error: %v]\033[0m\n", err)
+		// Check if context deadline exceeded (timeout)
+		if ctx.Err() == context.DeadlineExceeded {
+			fmt.Printf("\n\033[31m[Error: Command timed out after %v]\033[0m\n", w.commandTimeout)
+		} else {
+			// Regular command error
+			fmt.Printf("\n\033[31m[Error: %v]\033[0m\n", err)
+		}
 	}
 
 	// Add a newline after command output to separate from status bar
@@ -299,22 +451,8 @@ func (w *Wrapper) addToHistory(command string) {
 	w.historyIndex = len(w.commandHistory)
 }
 
-// statusUpdateLoop runs in background to update status
-// NOTE: This function is currently disabled because background updates
-// interfere with liner's display. Status is updated after each command instead.
-func (w *Wrapper) statusUpdateLoop() {
-	ticker := time.NewTicker(5 * time.Second)
-	defer ticker.Stop()
-
-	for {
-		select {
-		case <-ticker.C:
-			w.updateStatus()
-		}
-	}
-}
-
 // updateStatus refreshes the status bar
+// Status is updated synchronously after each command to avoid display conflicts with readline
 func (w *Wrapper) updateStatus() {
 	// Render at bottom of terminal
 	w.renderBottomStatusBar()

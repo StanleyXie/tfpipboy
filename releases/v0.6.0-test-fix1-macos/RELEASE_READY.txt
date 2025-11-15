@@ -1,0 +1,204 @@
+================================================================================
+macOS TEST RELEASE - v0.6.0-test-fix1
+================================================================================
+
+Status: ✅ READY FOR DISTRIBUTION
+
+Release Date: 2025-11-15
+Commit: 1c98bc3
+Branch: claude/review-cli-wrapper-01SGi2ciK13nqvJi1HweKKFG
+Git Tag: v0.6.0-test-fix1-macos (created locally)
+
+================================================================================
+RELEASE ARTIFACTS
+================================================================================
+
+Location: /home/user/tfpipboy/dist/test-release-macos/
+
+📦 ARCHIVES:
+  ✓ tfpipboy_0.6.0-test-fix1_Darwin_x86_64.tar.gz  (1.5 MB)
+  ✓ tfpipboy_0.6.0-test-fix1_Darwin_arm64.tar.gz   (1.4 MB)
+
+🔐 CHECKSUMS (SHA256):
+  ✓ checksums_0.6.0-test-fix1.txt
+
+📄 DOCUMENTATION:
+  ✓ RELEASE_NOTES_v0.6.0-test-fix1.md    - Complete release notes
+  ✓ BUILD_INFO_MACOS.md                   - Build information
+  ✓ BUG_FIX_NOTES.md                      - Bug fix details
+  ✓ RELEASE_READY.txt                     - This file
+
+📁 BINARY DIRECTORIES:
+  ✓ darwin_amd64/                         - Intel binary + docs
+  ✓ darwin_arm64/                         - Apple Silicon binary + docs
+
+================================================================================
+CHECKSUMS (SHA256)
+================================================================================
+
+Archives:
+41e9e9daafbe88791ac5cf4e42cd583d57f8e9df692cee7d0dd142577754121b  tfpipboy_0.6.0-test-fix1_Darwin_arm64.tar.gz
+ce3ef473db57c89f2e052d12475e74b50f0e67fe1a2f82db9a2ff9c07ef16546  tfpipboy_0.6.0-test-fix1_Darwin_x86_64.tar.gz
+
+Binaries:
+4c6080674b2fc968c0f484ea04d24add954d2ab8d56d24ccefae6814a670cb59  darwin_arm64/tfpipboy
+f7affdb495359de173f130f0b1d8326581b38df8f09e929ede97189eea2ef468  darwin_amd64/tfpipboy
+
+================================================================================
+PLATFORMS
+================================================================================
+
+✓ macOS Intel (x86_64)
+  - Binary: 3.3 MB
+  - Archive: 1.5 MB
+  - Min Version: macOS 10.13+
+  - Compatible: All Intel Macs + Apple Silicon (via Rosetta 2)
+
+✓ macOS Apple Silicon (arm64)
+  - Binary: 3.2 MB
+  - Archive: 1.4 MB
+  - Min Version: macOS 11.0+
+  - Compatible: M1, M2, M3 Macs (native)
+
+================================================================================
+WHAT'S INCLUDED
+================================================================================
+
+🔒 Phase 1 Security Fixes:
+  ✓ History file security (0600 permissions, 10K line limit)
+  ✓ Command timeout (30 minutes default)
+  ✓ Input validation (path validation, symlink resolution)
+  ✓ Security documentation
+  ✓ Version management (centralized)
+
+🐛 Bug Fix (Fix1):
+  ✓ Backend type validation - made type field optional
+  ✓ Allows partial backend configurations
+  ✓ Fixes: "backend type is required" error
+
+🧪 Testing:
+  ✓ 14 unit tests - 100% pass rate
+  ✓ Race detector - PASSED
+  ✓ Coverage - 33.3% overall, 80%+ security functions
+
+================================================================================
+DISTRIBUTION INSTRUCTIONS
+================================================================================
+
+1. VERIFY INTEGRITY
+   cd /home/user/tfpipboy/dist/test-release-macos
+   sha256sum -c checksums_0.6.0-test-fix1.txt
+
+2. UPLOAD TO DISTRIBUTION SERVER
+   Upload the following files:
+   - tfpipboy_0.6.0-test-fix1_Darwin_x86_64.tar.gz
+   - tfpipboy_0.6.0-test-fix1_Darwin_arm64.tar.gz
+   - checksums_0.6.0-test-fix1.txt
+   - RELEASE_NOTES_v0.6.0-test-fix1.md
+
+3. ANNOUNCE RELEASE
+   - Platform: macOS (Intel + Apple Silicon)
+   - Version: 0.6.0-test-fix1
+   - Type: Test Release
+   - Status: Ready for Testing
+
+================================================================================
+DOWNLOAD INSTRUCTIONS FOR USERS
+================================================================================
+
+Intel Macs:
+  curl -LO [URL]/tfpipboy_0.6.0-test-fix1_Darwin_x86_64.tar.gz
+  echo "ce3ef473db57c89f2e052d12475e74b50f0e67fe1a2f82db9a2ff9c07ef16546  tfpipboy_0.6.0-test-fix1_Darwin_x86_64.tar.gz" | shasum -a 256 -c
+  tar xzf tfpipboy_0.6.0-test-fix1_Darwin_x86_64.tar.gz
+  chmod +x tfpipboy
+  sudo mv tfpipboy /usr/local/bin/
+
+Apple Silicon Macs:
+  curl -LO [URL]/tfpipboy_0.6.0-test-fix1_Darwin_arm64.tar.gz
+  echo "41e9e9daafbe88791ac5cf4e42cd583d57f8e9df692cee7d0dd142577754121b  tfpipboy_0.6.0-test-fix1_Darwin_arm64.tar.gz" | shasum -a 256 -c
+  tar xzf tfpipboy_0.6.0-test-fix1_Darwin_arm64.tar.gz
+  chmod +x tfpipboy
+  sudo mv tfpipboy /usr/local/bin/
+
+Verify:
+  tfpipboy --version
+  # Should output: tfpipboy version 0.6.0
+
+================================================================================
+IMPORTANT NOTES
+================================================================================
+
+⚠️  NOT CODE-SIGNED
+    First run will trigger macOS Gatekeeper warning.
+    Workaround: Right-click > Open, or use:
+    xattr -d com.apple.quarantine tfpipboy
+
+⚠️  TEST RELEASE
+    This is a test release for validation purposes.
+    Production release will include code signing and notarization.
+
+⚠️  CROSS-COMPILED
+    Binaries built on Linux using cross-compilation.
+    Recommend native macOS testing before production.
+
+================================================================================
+BUILD INFORMATION
+================================================================================
+
+Build Date:     2025-11-15
+Build Host:     Linux x86_64
+Go Version:     1.24.7
+CGO:            Disabled (static linking)
+LDFLAGS:        -s -w (stripped)
+Optimization:   33% size reduction vs unstripped
+
+Cross-compilation settings:
+  Intel:        GOOS=darwin GOARCH=amd64 CGO_ENABLED=0
+  Apple Silicon: GOOS=darwin GOARCH=arm64 CGO_ENABLED=0
+
+================================================================================
+GIT INFORMATION
+================================================================================
+
+Branch:  claude/review-cli-wrapper-01SGi2ciK13nqvJi1HweKKFG
+Commit:  1c98bc3
+Tag:     v0.6.0-test-fix1-macos (local)
+Pushed:  ✓ Commit pushed to remote
+
+Recent commits:
+  1c98bc3  fix: make backend type optional in configuration validation
+  1be5fa2  docs: add comprehensive test report for Phase 1 CLI wrapper fixes
+  62a4f2b  docs: add Phase 1 implementation summary for CLI wrapper security fixes
+
+================================================================================
+NEXT STEPS
+================================================================================
+
+✓ Release artifacts prepared
+✓ Documentation complete
+✓ Checksums verified
+✓ Code committed and pushed
+
+TODO:
+  [ ] Test on actual Intel Mac
+  [ ] Test on actual Apple Silicon Mac
+  [ ] Verify Gatekeeper workarounds
+  [ ] Collect user feedback
+  [ ] Plan production release with code signing
+
+================================================================================
+SUPPORT
+================================================================================
+
+Issues:      https://github.com/StanleyXie/tfpipboy/issues
+Repository:  https://github.com/StanleyXie/tfpipboy
+Branch:      claude/review-cli-wrapper-01SGi2ciK13nqvJi1HweKKFG
+
+================================================================================
+✅ RELEASE STATUS: READY FOR DISTRIBUTION
+================================================================================
+
+All artifacts verified and ready for upload to distribution server.
+Users can download, verify checksums, and test immediately.
+
+Generated: 2025-11-15
