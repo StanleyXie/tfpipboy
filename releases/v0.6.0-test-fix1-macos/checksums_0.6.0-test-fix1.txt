@@ -1,0 +1,2 @@
+41e9e9daafbe88791ac5cf4e42cd583d57f8e9df692cee7d0dd142577754121b  tfpipboy_0.6.0-test-fix1_Darwin_arm64.tar.gz
+ce3ef473db57c89f2e052d12475e74b50f0e67fe1a2f82db9a2ff9c07ef16546  tfpipboy_0.6.0-test-fix1_Darwin_x86_64.tar.gz
