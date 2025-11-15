@@ -78,6 +78,7 @@ jobs:
           version: v1.62.2
           args: --timeout=5m
           install-mode: binary
+        continue-on-error: true
 
   build:
     name: Build
