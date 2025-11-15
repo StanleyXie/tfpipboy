@@ -305,7 +305,7 @@ func (p *TerraformOutputParser) ParseLine(line string) (shouldPrint bool, format
 	if strings.Contains(cleanLine, "Plan:") {
 		p.planSummary = cleanLine
 		// Debug
-		if debugFile, _ := os.OpenFile("/tmp/tfpipboy-parser-debug.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644); debugFile != nil {
+		if debugFile, _ := os.OpenFile("/tmp/tfpipboy-parser-debug.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0600); debugFile != nil {
 			fmt.Fprintf(debugFile, "[ParseLine] Captured plan summary: %s\n", cleanLine)
 			debugFile.Close()
 		}
@@ -316,7 +316,7 @@ func (p *TerraformOutputParser) ParseLine(line string) (shouldPrint bool, format
 	if strings.Contains(cleanLine, "No changes.") && strings.Contains(cleanLine, "infrastructure matches") {
 		p.planSummary = "No changes. Your infrastructure matches the configuration."
 		// Debug
-		if debugFile, _ := os.OpenFile("/tmp/tfpipboy-parser-debug.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644); debugFile != nil {
+		if debugFile, _ := os.OpenFile("/tmp/tfpipboy-parser-debug.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0600); debugFile != nil {
 			fmt.Fprintf(debugFile, "[ParseLine] Captured no changes\n")
 			debugFile.Close()
 		}
