@@ -12,7 +12,6 @@ import (
 	"strings"
 	"syscall"
 	"time"
-	"unsafe"
 
 	"github.com/StanleyXie/tfpipboy/pkg/auth"
 	"github.com/StanleyXie/tfpipboy/pkg/terraform"
@@ -40,8 +39,8 @@ const (
 	showCursor    = "\033[?25h" // Show cursor
 
 	// Security and performance settings
-	maxHistoryLines      = 10000            // Maximum lines in history file to prevent unbounded growth
-	historyFileMode      = 0600             // User read/write only for security
+	maxHistoryLines       = 10000            // Maximum lines in history file to prevent unbounded growth
+	historyFileMode       = 0600             // User read/write only for security
 	defaultCommandTimeout = 30 * time.Minute // Default timeout for command execution
 )
 
@@ -494,29 +493,6 @@ func truncate(s string, max int) string {
 }
 
 // getTerminalSize returns the terminal dimensions
-func (w *Wrapper) getTerminalSize() (width, height int) {
-	// Use syscall to get terminal size
-	type winsize struct {
-		Row    uint16
-		Col    uint16
-		Xpixel uint16
-		Ypixel uint16
-	}
-
-	ws := &winsize{}
-	retCode, _, errno := syscall.Syscall(syscall.SYS_IOCTL,
-		uintptr(syscall.Stdout),
-		uintptr(syscall.TIOCGWINSZ),
-		uintptr(unsafe.Pointer(ws)))
-
-	if int(retCode) == -1 || errno != 0 {
-		// Default size if we can't detect
-		return 80, 24
-	}
-
-	return int(ws.Col), int(ws.Row)
-}
-
 // renderBottomStatusBar renders the status bar at the bottom of the terminal
 func (w *Wrapper) renderBottomStatusBar() {
 	// Get current status
