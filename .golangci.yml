@@ -42,7 +42,6 @@ linters:
     - typecheck
     - unconvert
     - unused
-    - shadow
 
 issues:
   exclude-use-default: false
