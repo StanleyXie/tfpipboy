@@ -1,4 +1,4 @@
-# tf-pipboy Configuration Format Specification
+# tfpipboy Configuration Format Specification
 
 **Version**: 1.0  
 **Status**: Draft  
@@ -8,7 +8,7 @@
 
 ## Overview
 
-This document defines the complete configuration format for tf-pipboy's declarative orchestration system. The configuration is split across 5 YAML files in the `.tfpipboy/` directory.
+This document defines the complete configuration format for tfpipboy's declarative orchestration system. The configuration is split across 5 YAML files in the `.tfpipboy/` directory.
 
 ## Directory Structure
 

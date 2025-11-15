@@ -1,7 +1,7 @@
-# Ghostty Integration Strategy for tf-pipboy
+# Ghostty Integration Strategy for tfpipboy
 
 **Date**: 2025-10-10  
-**Purpose**: Define how tf-pipboy can leverage Ghostty terminal emulator features
+**Purpose**: Define how tfpipboy can leverage Ghostty terminal emulator features
 
 ## What is Ghostty?
 
@@ -28,11 +28,11 @@ Ghostty provides automatic shell integration for bash, zsh, fish, and elvish wit
 
 **What it is**: Ghostty implements OSC 133 semantic markup to mark prompt boundaries and command execution phases.
 
-**How tf-pipboy can use it:**
+**How tfpipboy can use it:**
 ```bash
-# Emit OSC 133 sequences to mark tf-pipboy context display
+# Emit OSC 133 sequences to mark tfpipboy context display
 printf '\e]133;A\e\\'  # Mark prompt start
-echo "tf-pipboy context: production @ aws/vpc"
+echo "tfpipboy context: production @ aws/vpc"
 printf '\e]133;B\e\\'  # Mark prompt end
 
 # Then run terraform
@@ -41,7 +41,7 @@ terraform plan
 
 **Benefits:**
 - Allows users to jump between prompts with keybindings
-- Ghostty can visually distinguish tf-pipboy output from terraform output
+- Ghostty can visually distinguish tfpipboy output from terraform output
 - Better scrollback navigation
 
 **Implementation Priority**: ⭐⭐⭐ Medium (nice to have)
@@ -52,9 +52,9 @@ terraform plan
 
 **What it is**: Ghostty tracks the current working directory through shell integration.
 
-**How tf-pipboy can use it:**
+**How tfpipboy can use it:**
 - Ghostty already knows the current directory
-- tf-pipboy can use this for Terraform module detection
+- tfpipboy can use this for Terraform module detection
 - Potential for future integration with Ghostty's directory tracking
 
 **Benefits:**
@@ -69,11 +69,11 @@ terraform plan
 
 **What it is**: Ghostty supports various terminal escape sequences for customization.
 
-**How tf-pipboy can use it:**
+**How tfpipboy can use it:**
 
 ```bash
 # Set terminal title to show Terraform context
-printf '\e]0;tf-pipboy: production @ aws/vpc\e\\'
+printf '\e]0;tfpipboy: production @ aws/vpc\e\\'
 
 # Change cursor color based on auth status
 # Green cursor = all auth OK, red = missing auth
@@ -91,13 +91,13 @@ printf '\e]12;#00ff00\e\\'  # Green cursor
 
 #### 1.4 Status Bar / Terminal Title
 
-**What it is**: Update terminal title to show tf-pipboy context persistently.
+**What it is**: Update terminal title to show tfpipboy context persistently.
 
 **Implementation:**
 ```python
 def set_terminal_title(context: TerraformContext, auth: AuthStatus):
     """Set terminal title with current context"""
-    title = f"tf-pipboy: {context.workspace} @ {context.module}"
+    title = f"tfpipboy: {context.workspace} @ {context.module}"
     
     if not auth.all_ok():
         title += " ⚠️ Auth Issues"
@@ -108,7 +108,7 @@ def set_terminal_title(context: TerraformContext, auth: AuthStatus):
 
 **Example Terminal Title:**
 ```
-tf-pipboy: production @ aws/vpc ✓
+tfpipboy: production @ aws/vpc ✓
 ```
 
 **Benefits:**
@@ -128,7 +128,7 @@ These features work best in Ghostty but degrade gracefully in other terminals.
 
 **What it is**: Ghostty supports synchronized rendering (DEC mode 2026) to prevent tearing during updates.
 
-**How tf-pipboy can use it:**
+**How tfpipboy can use it:**
 ```python
 def display_context_with_sync():
     # Begin synchronized update
@@ -154,7 +154,7 @@ def display_context_with_sync():
 
 **What it is**: Ghostty supports clickable hyperlinks in terminal output.
 
-**How tf-pipboy can use it:**
+**How tfpipboy can use it:**
 ```python
 def make_link(url: str, text: str) -> str:
     """Create clickable terminal link"""
@@ -182,7 +182,7 @@ print(f"AWS: {make_link(console_url, region)}")
 
 **What it is**: Ghostty supports the Kitty graphics protocol for displaying images in terminal.
 
-**How tf-pipboy could use it (future):**
+**How tfpipboy could use it (future):**
 - Display infrastructure diagrams
 - Show resource graphs
 - Render plan output as visual diff
@@ -207,15 +207,15 @@ tfpipboy plan --with-graph
 
 **Status**: libghostty is not yet stable for standalone use (as of Ghostty 1.0)
 
-**Long-term Vision**: When libghostty stabilizes, tf-pipboy could embed terminal emulation directly.
+**Long-term Vision**: When libghostty stabilizes, tfpipboy could embed terminal emulation directly.
 
 #### 3.1 Embedded Terminal View
 
-**Concept**: tf-pipboy becomes a full application with embedded Ghostty terminal.
+**Concept**: tfpipboy becomes a full application with embedded Ghostty terminal.
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│ tf-pipboy - Context-Aware Terraform Environment             │
+│ tfpipboy - Context-Aware Terraform Environment             │
 ├─────────────────────────────────────────────────────────────┤
 │ Context Panel                                               │
 │ ┌─────────────────────────────────────────────────────────┐ │
@@ -358,7 +358,7 @@ else:
 **File**: `~/.config/ghostty/config`
 
 ```conf
-# tf-pipboy optimizations
+# tfpipboy optimizations
 shell-integration = detect
 shell-integration-features = cursor,sudo,title
 
@@ -368,14 +368,14 @@ hyperlink = true
 # Smooth rendering
 sync-updates = true
 
-# Custom keybind to show tf-pipboy status
+# Custom keybind to show tfpipboy status
 keybind = ctrl+shift+t=text:\u001b]133;A\u001b\\tfpipboy status\u001b]133;B\u001b\\\n
 
-# Optional: Set theme that works well with tf-pipboy colors
+# Optional: Set theme that works well with tfpipboy colors
 theme = dark:tokyonight
 ```
 
-### tf-pipboy Configuration for Ghostty
+### tfpipboy Configuration for Ghostty
 
 **File**: `~/.tfpipboy/config.yaml`
 
@@ -422,8 +422,8 @@ echo
 
 # Test 1: Terminal Title
 echo "Test 1: Terminal Title"
-printf '\e]0;tf-pipboy: test-workspace @ test/module\e\\'
-echo "✓ Terminal title should show: tf-pipboy: test-workspace @ test/module"
+printf '\e]0;tfpipboy: test-workspace @ test/module\e\\'
+echo "✓ Terminal title should show: tfpipboy: test-workspace @ test/module"
 sleep 2
 
 # Test 2: Hyperlink
@@ -471,7 +471,7 @@ If not using Ghostty or for broader compatibility, consider these libraries that
 ### tmux Status Bar Integration
 
 ```bash
-# Update tmux status bar with tf-pipboy context
+# Update tmux status bar with tfpipboy context
 tmux set-option -g status-right "#[fg=green]#{pane_current_path} #[fg=yellow]production"
 ```
 
@@ -489,7 +489,7 @@ symbol = "🚀 "
 
 ## Summary & Recommendations
 
-### For tf-pipboy v1.0 (MVP)
+### For tfpipboy v1.0 (MVP)
 
 **Implement Now:**
 1. ✅ Terminal title updates (OSC 0) - High impact, easy
@@ -504,14 +504,14 @@ symbol = "🚀 "
 ### For Ghostty Users
 
 **Value Proposition:**
-- Best-in-class terminal experience for tf-pipboy
+- Best-in-class terminal experience for tfpipboy
 - Clickable links to cloud consoles
 - Smooth context updates
 - Visual auth status indicators
 - Future: Even deeper integration via libghostty
 
 **Compatibility:**
-- tf-pipboy works great in any terminal
+- tfpipboy works great in any terminal
 - Ghostty users get enhanced features automatically
 - No lock-in: switching terminals doesn't break functionality
 

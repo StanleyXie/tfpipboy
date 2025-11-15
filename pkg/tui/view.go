@@ -43,7 +43,7 @@ func (m Model) View() string {
 	}
 
 	// Title bar
-	title := titleStyle.Width(m.width).Render("tf-pipboy v0.1.0")
+	title := titleStyle.Width(m.width).Render("tfpipboy v0.1.0")
 
 	// Status bar with authentication and Terraform context
 	statusText := m.renderStatus()

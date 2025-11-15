@@ -11,8 +11,8 @@ import (
 	"time"
 	"unsafe"
 
-	"github.com/StanleyXie/tf-pipboy/pkg/auth"
-	"github.com/StanleyXie/tf-pipboy/pkg/terraform"
+	"github.com/StanleyXie/tfpipboy/pkg/auth"
+	"github.com/StanleyXie/tfpipboy/pkg/terraform"
 	"github.com/ergochat/readline"
 )
 
@@ -138,7 +138,7 @@ func (w *Wrapper) Run() error {
 func (w *Wrapper) printWelcome() {
 	clearScreen()
 	fmt.Printf("%s╭────────────────────────────────────────────────────────────────────╮%s\n", colorCyan, colorReset)
-	fmt.Printf("%s│%s                        %stf-pipboy v0.2.0%s                            %s│%s\n",
+	fmt.Printf("%s│%s                        %stfpipboy v0.2.0%s                            %s│%s\n",
 		colorCyan, colorReset, colorBold+colorYellow, colorReset, colorCyan, colorReset)
 	fmt.Printf("%s│%s                    %sCLI Wrapper for Terraform%s                       %s│%s\n",
 		colorCyan, colorReset, colorWhite, colorReset, colorCyan, colorReset)
@@ -322,12 +322,12 @@ func (w *Wrapper) updateStatus() {
 
 // printHelp prints help information
 func (w *Wrapper) printHelp() {
-	fmt.Println("\n╭─── tf-pipboy Help ─────────────────────────────────────────────╮")
+	fmt.Println("\n╭─── tfpipboy Help ─────────────────────────────────────────────╮")
 	fmt.Println("│                                                                │")
 	fmt.Println("│  Built-in Commands:                                            │")
 	fmt.Println("│    cd <dir>     Change directory                               │")
 	fmt.Println("│    help         Show this help                                 │")
-	fmt.Println("│    exit/quit    Exit tf-pipboy                                 │")
+	fmt.Println("│    exit/quit    Exit tfpipboy                                 │")
 	fmt.Println("│                                                                │")
 	fmt.Println("│  All other commands are passed directly to your shell          │")
 	fmt.Println("│  with full terminal access (real-time output, interactivity)   │")

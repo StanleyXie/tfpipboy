@@ -6,7 +6,7 @@
 
 ## Overview
 
-tf-pipboy executes multiple Terraform jobs concurrently for performance. All code handling parallel execution **MUST be thread-safe by design**.
+tfpipboy executes multiple Terraform jobs concurrently for performance. All code handling parallel execution **MUST be thread-safe by design**.
 
 ## The Thread-Safety Rule
 
@@ -346,6 +346,6 @@ For any PR touching parallel execution:
 
 ## Conclusion
 
-Thread-safety is **non-negotiable** for tf-pipboy's parallel execution. By following the principle of avoiding shared mutable state and using immutable parameters, we ensure reliable and predictable concurrent behavior.
+Thread-safety is **non-negotiable** for tfpipboy's parallel execution. By following the principle of avoiding shared mutable state and using immutable parameters, we ensure reliable and predictable concurrent behavior.
 
 **When in doubt, pass it as a parameter.**

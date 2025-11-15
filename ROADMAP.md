@@ -1,8 +1,8 @@
-# tf-pipboy Roadmap
+# tfpipboy Roadmap
 
 ## Project Vision
 
-tf-pipboy is a Terraform orchestration tool that enables teams to manage complex, multi-module Terraform deployments with parallel execution, dependency management, and real-time status monitoring.
+tfpipboy is a Terraform orchestration tool that enables teams to manage complex, multi-module Terraform deployments with parallel execution, dependency management, and real-time status monitoring.
 
 **Core Principles:**
 - Non-invasive: Works alongside existing Terraform workflows

@@ -2,7 +2,7 @@
 
 ## Why "terraform: command not found"?
 
-tf-pipboy is a **wrapper** around Terraform, which means Terraform itself needs to be installed on your system separately.
+tfpipboy is a **wrapper** around Terraform, which means Terraform itself needs to be installed on your system separately.
 
 ## Installing Terraform on Mac
 
@@ -40,9 +40,9 @@ Terraform v1.x.x
 on darwin_arm64
 ```
 
-## Using Terraform with tf-pipboy
+## Using Terraform with tfpipboy
 
-Once Terraform is installed, you can run it through tf-pipboy:
+Once Terraform is installed, you can run it through tfpipboy:
 
 ```bash
 ./bin/tfpipboy
@@ -56,7 +56,7 @@ Once Terraform is installed, you can run it through tf-pipboy:
 
 ## Other Tools You Might Need
 
-tf-pipboy also detects authentication for these CLIs (install as needed):
+tfpipboy also detects authentication for these CLIs (install as needed):
 
 ### Azure CLI
 ```bash
@@ -82,9 +82,9 @@ brew install google-cloud-sdk
 gcloud auth login
 ```
 
-## What tf-pipboy Provides
+## What tfpipboy Provides
 
-tf-pipboy **wraps** Terraform to add:
+tfpipboy **wraps** Terraform to add:
 - ✅ Real-time context awareness (workspace, backend, module)
 - ✅ Authentication status monitoring (Azure, GitHub, AWS, GCP)
 - ✅ Environment variable detection
@@ -94,7 +94,7 @@ tf-pipboy **wraps** Terraform to add:
 ## Quick Start
 
 1. Install Terraform (see above)
-2. Run tf-pipboy:
+2. Run tfpipboy:
    ```bash
    cd /path/to/your/terraform/project
    ./bin/tfpipboy
@@ -117,7 +117,7 @@ Hint: 'terraform' command not found in PATH. Install it first:
 
 ### PATH issues
 
-If Terraform is installed but tf-pipboy can't find it:
+If Terraform is installed but tfpipboy can't find it:
 
 1. Check where Terraform is installed:
    ```bash
@@ -142,12 +142,12 @@ If Terraform is installed but tf-pipboy can't find it:
 
 ### Shell integration
 
-tf-pipboy executes commands through your shell (`$SHELL`), so:
+tfpipboy executes commands through your shell (`$SHELL`), so:
 - ✅ All your shell aliases work
 - ✅ All your environment variables are inherited
 - ✅ Your PATH is preserved
 
-If commands work in your terminal but not in tf-pipboy, check:
+If commands work in your terminal but not in tfpipboy, check:
 ```bash
 echo $SHELL  # Should show /bin/zsh or /bin/bash
 ```
@@ -161,7 +161,7 @@ brew install terraform
 # 2. Navigate to your Terraform project
 cd ~/projects/terraform/my-infrastructure
 
-# 3. Run tf-pipboy
+# 3. Run tfpipboy
 ./bin/tfpipboy
 
 # 4. Check context in status bar
@@ -181,5 +181,5 @@ cd ~/projects/terraform/my-infrastructure
 ## Need Help?
 
 - Terraform installation issues: https://terraform.io/downloads
-- tf-pipboy issues: https://github.com/StanleyXie/tf-pipboy/issues
+- tfpipboy issues: https://github.com/StanleyXie/tfpipboy/issues
 - Terraform documentation: https://terraform.io/docs

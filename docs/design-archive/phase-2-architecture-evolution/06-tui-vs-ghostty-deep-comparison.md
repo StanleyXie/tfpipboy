@@ -1,7 +1,7 @@
 # TUI Framework vs Ghostty Integration: Deep Comparison
 
 **Date**: 2025-10-10  
-**Purpose**: Comprehensive comparison of two architectural approaches for tf-pipboy
+**Purpose**: Comprehensive comparison of two architectural approaches for tfpipboy
 
 ## Executive Summary
 
@@ -29,7 +29,7 @@
 
 ### Overview
 
-Build tf-pipboy as a standalone TUI application using mature frameworks:
+Build tfpipboy as a standalone TUI application using mature frameworks:
 - **Python**: Textual (modern, reactive, feature-rich)
 - **Go**: Bubble Tea (Elm architecture, production-tested)
 
@@ -39,7 +39,7 @@ Build tf-pipboy as a standalone TUI application using mature frameworks:
 $ tfpipboy tui
 
 ┌─────────────────────────────────────────────────────────────┐
-│ tf-pipboy v1.0                          [F1] Help [Q] Quit  │
+│ tfpipboy v1.0                          [F1] Help [Q] Quit  │
 ├─────────────────────────────────────────────────────────────┤
 │ Status Bar (Auto-refresh: 5s)                               │
 ├─────────────────────────────────────────────────────────────┤
@@ -321,7 +321,7 @@ From research:
 **What you can do:**
 ```bash
 # Update Ghostty terminal title
-printf '\e]0;tf-pipboy: production @ aws/vpc\a'
+printf '\e]0;tfpipboy: production @ aws/vpc\a'
 
 # OSC 133 prompt marking
 printf '\e]133;A\e\\'  # Prompt start
@@ -892,7 +892,7 @@ $ tfpipboy plan
 # First: Install Ghostty
 brew install ghostty  # or build from source
 
-# Then: Install tf-pipboy-ghostty
+# Then: Install tfpipboy-ghostty
 brew install tfpipboy-ghostty
 
 # Switch to Ghostty as default terminal
@@ -902,7 +902,7 @@ brew install tfpipboy-ghostty
 ```bash
 # Must use Ghostty terminal
 $ open -a Ghostty
-# Then use tf-pipboy features
+# Then use tfpipboy features
 ```
 
 **User Requirements:**

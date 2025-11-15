@@ -14,7 +14,7 @@ linters-settings:
   gocyclo:
     min-complexity: 15
   goimports:
-    local-prefixes: github.com/StanleyXie/tf-pipboy
+    local-prefixes: github.com/StanleyXie/tfpipboy
   golint:
     min-confidence: 0
   govet:

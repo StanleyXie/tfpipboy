@@ -1,6 +1,6 @@
-# tf-pipboy User Guide
+# tfpipboy User Guide
 
-Complete guide to using tf-pipboy for Terraform orchestration.
+Complete guide to using tfpipboy for Terraform orchestration.
 
 ## Table of Contents
 
@@ -20,7 +20,7 @@ Complete guide to using tf-pipboy for Terraform orchestration.
 
 ## Overview
 
-tf-pipboy is a Terraform orchestration tool that manages complex, multi-module deployments with dependency-aware execution, parallel processing, and real-time monitoring.
+tfpipboy is a Terraform orchestration tool that manages complex, multi-module deployments with dependency-aware execution, parallel processing, and real-time monitoring.
 
 ### Key Features
 
@@ -99,7 +99,7 @@ modules:
 ```
 
 **Dependency Resolution:**
-- tf-pipboy automatically determines execution order
+- tfpipboy automatically determines execution order
 - Modules with no dependencies run first
 - Dependent modules wait for their dependencies to complete
 - Independent modules can run in parallel
@@ -191,7 +191,7 @@ tfpipboy --operation plan --targets-all --verbose
 
 ## Configuration
 
-tf-pipboy uses a YAML-based configuration in the `.tfpipboy/` directory.
+tfpipboy uses a YAML-based configuration in the `.tfpipboy/` directory.
 
 ### Basic Configuration
 
@@ -339,7 +339,7 @@ tfpipboy --operation validate --targets-all
 
 ## Parallel Execution
 
-tf-pipboy automatically parallelizes independent modules.
+tfpipboy automatically parallelizes independent modules.
 
 ### How It Works
 
@@ -395,7 +395,7 @@ tfpipboy --operation apply --targets-all --parallel-all
 
 ## Authentication Monitoring
 
-tf-pipboy monitors authentication status for cloud providers.
+tfpipboy monitors authentication status for cloud providers.
 
 ### Supported Providers
 
@@ -429,7 +429,7 @@ Checks via: `gh auth status`
 
 ### Authentication Errors
 
-tf-pipboy blocks execution if required authentication is missing:
+tfpipboy blocks execution if required authentication is missing:
 
 ```
 ERROR: Required authentication missing or expired
@@ -464,12 +464,12 @@ gh auth login
 
 ## Live Board Interface
 
-tf-pipboy includes a beautiful TUI (Text User Interface) for real-time status.
+tfpipboy includes a beautiful TUI (Text User Interface) for real-time status.
 
 ### Layout
 
 ```
-╭─────────────────────── tf-pipboy Status ───────────────────────╮
+╭─────────────────────── tfpipboy Status ───────────────────────╮
 │ Project: my-infrastructure        Operation: apply            │
 │ Environment: production           Concurrent: 3                │
 ╰────────────────────────────────────────────────────────────────╯
@@ -697,4 +697,4 @@ Check logs in `.tfpipboy/logs/`:
 
 ---
 
-**Need Help?** See [GitHub Issues](https://github.com/StanleyXie/tf-pipboy/issues) or [Discussions](https://github.com/StanleyXie/tf-pipboy/discussions)
+**Need Help?** See [GitHub Issues](https://github.com/StanleyXie/tfpipboy/issues) or [Discussions](https://github.com/StanleyXie/tfpipboy/discussions)

@@ -9,8 +9,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/StanleyXie/tf-pipboy/pkg/auth"
-	"github.com/StanleyXie/tf-pipboy/pkg/terraform"
+	"github.com/StanleyXie/tfpipboy/pkg/auth"
+	"github.com/StanleyXie/tfpipboy/pkg/terraform"
 	tea "github.com/charmbracelet/bubbletea"
 )
 

@@ -2,7 +2,7 @@
 
 ## Overview
 
-Split tf-pipboy into two separate applications:
+Split tfpipboy into two separate applications:
 1. **pipboy-commander**: TUI orchestration dashboard (control plane)
 2. **pipboy-soldier**: CLI wrapper for individual module execution (data plane)
 
@@ -178,7 +178,7 @@ STATUS:success:2m34s
 ## File Structure
 
 ```
-tf-pipboy/
+tfpipboy/
 ├── cmd/
 │   ├── commander/
 │   │   └── main.go          # TUI orchestration app
@@ -525,7 +525,7 @@ type ExecuteResult struct {
 
 ## Conclusion
 
-The **commander-soldier architecture** is the optimal design for tf-pipboy:
+The **commander-soldier architecture** is the optimal design for tfpipboy:
 
 - **Commander**: Beautiful TUI for orchestration and monitoring
 - **Soldier**: Simple, focused CLI wrapper for execution

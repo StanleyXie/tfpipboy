@@ -2,13 +2,13 @@
 
 ## Overview
 
-tf-pipboy now automatically detects and injects GitHub CLI authentication into Terraform executions, enabling seamless use of the Terraform GitHub provider without manual token management.
+tfpipboy now automatically detects and injects GitHub CLI authentication into Terraform executions, enabling seamless use of the Terraform GitHub provider without manual token management.
 
 ## Features
 
 ### Automatic Token Injection
 
-When you run Terraform modules that use the GitHub provider, tf-pipboy automatically:
+When you run Terraform modules that use the GitHub provider, tfpipboy automatically:
 1. Detects your local `gh` CLI authentication
 2. Retrieves the active GitHub token
 3. Injects it as `GITHUB_TOKEN` environment variable into the Terraform execution
@@ -16,7 +16,7 @@ When you run Terraform modules that use the GitHub provider, tf-pipboy automatic
 ### Multiple Account Support
 
 If you have multiple GitHub accounts authenticated via `gh` CLI:
-- tf-pipboy detects all available accounts
+- tfpipboy detects all available accounts
 - Shows the active account in the execution plan preview
 - Automatically uses the active account's token
 - Displays account count in the preview
@@ -42,14 +42,14 @@ Authentication Status:
 
 ### 1. GitHub CLI Authentication Check
 
-tf-pipboy runs `gh auth status` to detect:
+tfpipboy runs `gh auth status` to detect:
 - Authenticated GitHub accounts
 - Active account
 - Token availability
 
 ### 2. Token Retrieval
 
-For the active account, tf-pipboy runs `gh auth token` to retrieve the OAuth token.
+For the active account, tfpipboy runs `gh auth token` to retrieve the OAuth token.
 
 ### 3. Environment Variable Injection
 
@@ -147,7 +147,7 @@ provider "github" {
 
 resource "github_repository" "my_repo" {
   name        = "my-terraform-repo"
-  description = "Created via tf-pipboy"
+  description = "Created via tfpipboy"
   visibility  = "private"
   
   has_issues = true
@@ -155,7 +155,7 @@ resource "github_repository" "my_repo" {
 }
 ```
 
-**tf-pipboy Configuration:**
+**tfpipboy Configuration:**
 ```yaml
 # .tfpipboy/tfproject.yaml
 version: "1.0"
@@ -168,7 +168,7 @@ modules:
       path: "terraform.tfstate"
 ```
 
-**Run with tf-pipboy:**
+**Run with tfpipboy:**
 ```bash
 tfpipboy orchestrate plan
 # ✓ GitHub: YourUsername (active)
@@ -191,7 +191,7 @@ gh auth switch
 gh auth status
 ```
 
-**Run tf-pipboy:**
+**Run tfpipboy:**
 ```bash
 tfpipboy orchestrate plan
 # ✓ GitHub: DifferentAccount (active: DifferentAccount, available: 2 accounts)
@@ -218,14 +218,14 @@ export GITHUB_TOKEN="ghp_custom_token_here"
 tfpipboy orchestrate apply
 ```
 
-tf-pipboy respects manually set `GITHUB_TOKEN` and won't override it.
+tfpipboy respects manually set `GITHUB_TOKEN` and won't override it.
 
 ## Security Considerations
 
 ### Token Security
 
 1. **Keychain Storage**: `gh` CLI stores tokens securely in your system keychain
-2. **No Token Logging**: tf-pipboy never logs the actual token value
+2. **No Token Logging**: tfpipboy never logs the actual token value
 3. **Workspace Isolation**: Tokens are only passed to isolated Terraform workspaces
 4. **Process Lifetime**: Tokens exist only during the Terraform execution
 

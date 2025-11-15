@@ -4,9 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**tf-pipboy** is a CLI tool that wraps Terraform to provide an enhanced command-line environment with real-time context awareness. It maintains full Terraform compatibility while adding workspace context and authentication status visibility.
+**tfpipboy** is a CLI tool that wraps Terraform to provide an enhanced command-line environment with real-time context awareness. It maintains full Terraform compatibility while adding workspace context and authentication status visibility.
 
-REPO Local path: `/Users/stanleyxie/Workspace/Projects/tf-pipboy`
+REPO Local path: `/Users/stanleyxie/Workspace/Projects/tfpipboy`
 
 ### Project Structure
 - `source/`: Source code for the project
@@ -77,7 +77,7 @@ Track and display login status for:
 
 **Example Header Display:**
 ```
-╭─────────────────────── tf-pipboy context ───────────────────────╮
+╭─────────────────────── tfpipboy context ────────────────────────╮
 │ Module:    aws/vpc                    Workspace: production     │
 │ Backend:   s3://my-terraform-state/vpc                          │
 │ Auth:      ✓ AWS (123456789012)  ✓ Azure  ✗ GCP  ✓ GitHub     │
@@ -118,7 +118,7 @@ User Input → CLI Parser → Context Aggregator (parallel) → Display Engine �
 
 ## Fundamental Design Principle: Thread-Safe Parallel Execution
 
-**CRITICAL**: tf-pipboy executes multiple Terraform jobs concurrently. All code handling parallel execution MUST be thread-safe by design.
+**CRITICAL**: tfpipboy executes multiple Terraform jobs concurrently. All code handling parallel execution MUST be thread-safe by design.
 
 ### The Thread-Safety Rule
 
@@ -267,7 +267,7 @@ pipx install .           # Install globally
 **If Go:**
 ```bash
 # Setup
-go mod init github.com/yourusername/tf-pipboy
+go mod init github.com/yourusername/tfpipboy
 go mod tidy
 
 # Development

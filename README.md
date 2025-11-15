@@ -1,16 +1,16 @@
-# tf-pipboy
+# tfpipboy
 
 **Terraform orchestration tool with parallel execution, dependency management, and real-time monitoring.**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Go Version](https://img.shields.io/github/go-mod/go-version/StanleyXie/tf-pipboy)](go.mod)
-[![Release](https://img.shields.io/github/v/release/StanleyXie/tf-pipboy)](https://github.com/StanleyXie/tf-pipboy/releases)
+[![Go Version](https://img.shields.io/github/go-mod/go-version/StanleyXie/tfpipboy)](go.mod)
+[![Release](https://img.shields.io/github/v/release/StanleyXie/tfpipboy)](https://github.com/StanleyXie/tfpipboy/releases)
 
 ---
 
 ## Overview
 
-tf-pipboy is a powerful Terraform orchestration tool that simplifies managing complex, multi-module infrastructure deployments. It provides dependency-aware execution, parallel processing, and real-time monitoring through a beautiful terminal interface.
+tfpipboy is a powerful Terraform orchestration tool that simplifies managing complex, multi-module infrastructure deployments. It provides dependency-aware execution, parallel processing, and real-time monitoring through a beautiful terminal interface.
 
 ### Key Features
 
@@ -36,13 +36,13 @@ brew install tfpipboy
 
 #### Go Install
 ```bash
-go install github.com/StanleyXie/tf-pipboy/cmd/tfpipboy@latest
+go install github.com/StanleyXie/tfpipboy/cmd/tfpipboy@latest
 ```
 
 #### From Source
 ```bash
-git clone https://github.com/StanleyXie/tf-pipboy.git
-cd tf-pipboy
+git clone https://github.com/StanleyXie/tfpipboy.git
+cd tfpipboy
 make build
 make install
 ```
@@ -160,7 +160,7 @@ Reusable deployment workflows with multiple stages.
 
 ### Parallel Execution
 
-tf-pipboy automatically runs independent modules in parallel:
+tfpipboy automatically runs independent modules in parallel:
 
 ```
 Stage 1: networking (runs alone)
@@ -245,7 +245,7 @@ tfpipboy --operation plan --targets-all --verbose
 ## Project Structure
 
 ```
-tf-pipboy/
+tfpipboy/
 ├── cmd/
 │   └── tfpipboy/          # Main application
 ├── pkg/
@@ -278,8 +278,8 @@ tf-pipboy/
 
 ```bash
 # Clone repository
-git clone https://github.com/StanleyXie/tf-pipboy.git
-cd tf-pipboy
+git clone https://github.com/StanleyXie/tfpipboy.git
+cd tfpipboy
 
 # Install dependencies
 go mod download
@@ -317,7 +317,7 @@ We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for:
 
 ## Architecture
 
-tf-pipboy uses an async event-driven architecture:
+tfpipboy uses an async event-driven architecture:
 
 - **Orchestrator**: Coordinates module execution
 - **Dependency Graph**: Determines execution order
@@ -331,7 +331,7 @@ See [Design Archive](docs/design-archive/) for complete architecture history.
 
 ## Security
 
-tf-pipboy follows security best practices:
+tfpipboy follows security best practices:
 
 - No credential storage
 - Read-only authentication checks via official CLI tools
@@ -360,9 +360,9 @@ MIT License - see [LICENSE](LICENSE) for details.
 ## Links
 
 - **Documentation**: [docs/](docs/)
-- **Issues**: [GitHub Issues](https://github.com/StanleyXie/tf-pipboy/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/StanleyXie/tf-pipboy/discussions)
-- **Releases**: [GitHub Releases](https://github.com/StanleyXie/tf-pipboy/releases)
+- **Issues**: [GitHub Issues](https://github.com/StanleyXie/tfpipboy/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/StanleyXie/tfpipboy/discussions)
+- **Releases**: [GitHub Releases](https://github.com/StanleyXie/tfpipboy/releases)
 
 ---
 

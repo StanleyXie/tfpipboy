@@ -49,8 +49,8 @@ You have **three main options** depending on your situation:
 **Steps**:
 ```bash
 # 1. Create archive of current clean state
-cd /Users/stanleyxie/Workspace/Projects/tf-pipboy
-tar -czf ../tf-pipboy-clean.tar.gz \
+cd /Users/stanleyxie/Workspace/Projects/tfpipboy
+tar -czf ../tfpipboy-clean.tar.gz \
   --exclude='.git' \
   --exclude='examples' \
   --exclude='.tfpipboy' \
@@ -58,26 +58,26 @@ tar -czf ../tf-pipboy-clean.tar.gz \
 
 # 2. Create new repository
 cd ..
-mkdir tf-pipboy-clean
-cd tf-pipboy-clean
+mkdir tfpipboy-clean
+cd tfpipboy-clean
 git init
 git checkout -b main
 
 # 3. Extract clean code
-tar -xzf ../tf-pipboy-clean.tar.gz
+tar -xzf ../tfpipboy-clean.tar.gz
 
 # 4. Initial commit
 git add .
 git commit -m "Initial public release v0.6.0
 
-tf-pipboy - Terraform orchestration tool
+tfpipboy - Terraform orchestration tool
 - Parallel execution with dependency management
 - Authentication monitoring
 - Live board TUI
 - Complete documentation"
 
 # 5. Add remote and push
-git remote add origin https://github.com/StanleyXie/tf-pipboy.git
+git remote add origin https://github.com/StanleyXie/tfpipboy.git
 git push -u origin main --force
 
 # 6. Create release tag
@@ -112,11 +112,11 @@ brew install bfg
 
 # 2. Create backup
 cd /Users/stanleyxie/Workspace/Projects
-git clone --mirror tf-pipboy tf-pipboy-backup.git
+git clone --mirror tfpipboy tfpipboy-backup.git
 
 # 3. Clone fresh copy for cleaning
-git clone tf-pipboy tf-pipboy-clean
-cd tf-pipboy-clean
+git clone tfpipboy tfpipboy-clean
+cd tfpipboy-clean
 
 # 4. Delete sensitive files/folders from history
 bfg --delete-folders examples
@@ -144,8 +144,8 @@ brew install git-filter-repo
 
 # 2. Clone fresh copy
 cd /Users/stanleyxie/Workspace/Projects
-git clone tf-pipboy tf-pipboy-clean
-cd tf-pipboy-clean
+git clone tfpipboy tfpipboy-clean
+cd tfpipboy-clean
 
 # 3. Remove sensitive paths
 git filter-repo --path examples --invert-paths
@@ -153,7 +153,7 @@ git filter-repo --path tests --invert-paths
 git filter-repo --path .tfpipboy --invert-paths
 
 # 4. Add remote back (filter-repo removes it)
-git remote add origin https://github.com/StanleyXie/tf-pipboy.git
+git remote add origin https://github.com/StanleyXie/tfpipboy.git
 
 # 5. Force push (DESTRUCTIVE!)
 git push origin --force --all
@@ -180,7 +180,7 @@ git push origin --force --tags
 **Process**:
 ```bash
 # 1. Create orphan branch (no history)
-cd /Users/stanleyxie/Workspace/Projects/tf-pipboy
+cd /Users/stanleyxie/Workspace/Projects/tfpipboy
 git checkout --orphan clean-main
 
 # 2. Add all current clean files
@@ -229,7 +229,7 @@ git push origin v0.6.0 --force
 
 ## Recommended Approach
 
-### For tf-pipboy: **Option 1 (Start Fresh)** 
+### For tfpipboy: **Option 1 (Start Fresh)** 
 
 **Reasoning**:
 1. Repository contains real infrastructure examples
@@ -242,11 +242,11 @@ git push origin v0.6.0 --force
 
 ```bash
 # Step 1: Verify current state is clean
-cd /Users/stanleyxie/Workspace/Projects/tf-pipboy
+cd /Users/stanleyxie/Workspace/Projects/tfpipboy
 git status  # Should be clean
 
 # Step 2: Create clean archive
-tar -czf ../tf-pipboy-clean-$(date +%Y%m%d).tar.gz \
+tar -czf ../tfpipboy-clean-$(date +%Y%m%d).tar.gz \
   --exclude='.git' \
   --exclude='examples' \
   --exclude='.tfpipboy' \
@@ -255,16 +255,16 @@ tar -czf ../tf-pipboy-clean-$(date +%Y%m%d).tar.gz \
   .
 
 # Step 3: Verify archive
-tar -tzf ../tf-pipboy-clean-$(date +%Y%m%d).tar.gz | head -20
+tar -tzf ../tfpipboy-clean-$(date +%Y%m%d).tar.gz | head -20
 
 # Step 4: Create new clean repository
 cd ..
-mkdir tf-pipboy-public
-cd tf-pipboy-public
+mkdir tfpipboy-public
+cd tfpipboy-public
 git init -b main
 
 # Step 5: Extract clean code
-tar -xzf ../tf-pipboy-clean-$(date +%Y%m%d).tar.gz
+tar -xzf ../tfpipboy-clean-$(date +%Y%m%d).tar.gz
 
 # Step 6: Create .gitignore
 cat > .gitignore << 'EOF'
@@ -314,7 +314,7 @@ build/
 # Claude Code
 .CLAUDE/
 
-# tf-pipboy specific
+# tfpipboy specific
 /.tfpipboy/
 *.tfpipboy.cache
 
@@ -372,7 +372,7 @@ Features:
 See CHANGELOG.md for complete details."
 
 # Step 9: Add remote (when ready to make public)
-git remote add origin https://github.com/StanleyXie/tf-pipboy.git
+git remote add origin https://github.com/StanleyXie/tfpipboy.git
 
 # Step 10: Push (when ready)
 # git push -u origin main --force
@@ -514,7 +514,7 @@ If you accidentally push secrets:
 
 ## Summary
 
-**Recommended for tf-pipboy**: Start fresh with clean repository
+**Recommended for tfpipboy**: Start fresh with clean repository
 
 **Why**: Maximum security, simple process, appropriate for public release
 

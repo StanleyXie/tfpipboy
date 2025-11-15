@@ -6,7 +6,7 @@
 
 ## Objective
 
-Design a comprehensive, DRY (Don't Repeat Yourself) configuration format for tf-pipboy that:
+Design a comprehensive, DRY (Don't Repeat Yourself) configuration format for tfpipboy that:
 1. Eliminates configuration duplication
 2. Provides clear separation of concerns
 3. Supports module instances and dependencies
@@ -379,7 +379,7 @@ pipelines:
 
 ### vs. Terragrunt
 
-| Feature | tf-pipboy | Terragrunt |
+| Feature | tfpipboy | Terragrunt |
 |---------|-----------|------------|
 | Configuration format | YAML (5 files) | HCL (directory hierarchy) |
 | Backend config | Templates + interpolation | generate blocks |
@@ -395,7 +395,7 @@ pipelines:
 
 ### vs. Terraform Cloud/Enterprise
 
-| Feature | tf-pipboy | TFC/TFE |
+| Feature | tfpipboy | TFC/TFE |
 |---------|-----------|---------|
 | Hosting | Self-hosted | SaaS/Enterprise |
 | Configuration | Local YAML files | Web UI + VCS |

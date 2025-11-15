@@ -14,8 +14,8 @@ This is a major feature release introducing instance-based orchestration, execut
 
 ### From Source
 ```bash
-git clone https://github.com/yourusername/tf-pipboy.git
-cd tf-pipboy
+git clone https://github.com/yourusername/tfpipboy.git
+cd tfpipboy
 git checkout v0.2.0
 go build -o tfpipboy cmd/tfpipboy/main.go
 ```
@@ -24,7 +24,7 @@ go build -o tfpipboy cmd/tfpipboy/main.go
 ```bash
 # Download binary (when available)
 ./tfpipboy --version
-# tf-pipboy version 0.2.0
+# tfpipboy version 0.2.0
 ```
 
 ---
@@ -309,7 +309,7 @@ See [CHANGELOG.md](CHANGELOG.md) for complete migration guide.
 ## 🐛 Known Issues
 
 None currently. Please report issues at:
-https://github.com/yourusername/tf-pipboy/issues
+https://github.com/yourusername/tfpipboy/issues
 
 ---
 
@@ -345,8 +345,8 @@ Built with:
 
 ## 📞 Support
 
-- Issues: https://github.com/yourusername/tf-pipboy/issues
-- Discussions: https://github.com/yourusername/tf-pipboy/discussions
+- Issues: https://github.com/yourusername/tfpipboy/issues
+- Discussions: https://github.com/yourusername/tfpipboy/discussions
 
 ---
 

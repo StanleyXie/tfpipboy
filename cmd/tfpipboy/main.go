@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/StanleyXie/tf-pipboy/pkg/orchestrator"
+	"github.com/StanleyXie/tfpipboy/pkg/orchestrator"
 )
 
 const (
@@ -48,7 +48,7 @@ func main() {
 	flag.Parse()
 
 	if *showVersion {
-		fmt.Printf("tf-pipboy version %s\n", version)
+		fmt.Printf("tfpipboy version %s\n", version)
 		return
 	}
 
@@ -366,7 +366,7 @@ func main() {
 }
 
 func printHelp() {
-	fmt.Printf(`tf-pipboy - Terraform Module Orchestrator
+	fmt.Printf(`tfpipboy - Terraform Module Orchestrator
 
 USAGE:
     tfpipboy [OPTIONS]
@@ -459,7 +459,7 @@ NOTE:
     (similar to GitHub Actions). Use --cleanup to manage old artifacts.
 
 CONFIGURATION:
-    tf-pipboy looks for configuration files in the --config directory:
+    tfpipboy looks for configuration files in the --config directory:
     - tfproject.yaml    - Main project configuration
     - modules.yaml      - Module definitions and dependencies
     - pipelines.yaml    - Pipeline definitions

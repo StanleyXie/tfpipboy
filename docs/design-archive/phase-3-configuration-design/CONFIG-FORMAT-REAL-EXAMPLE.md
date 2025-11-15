@@ -1,6 +1,6 @@
 # Real-World Configuration Example for Azure Landing Zone
 
-This document demonstrates the complete tf-pipboy configuration format using real Azure Landing Zone deployment data from `examples/azure-landing-zone/exp-alz`.
+This document demonstrates the complete tfpipboy configuration format using real Azure Landing Zone deployment data from `examples/azure-landing-zone/exp-alz`.
 
 ## Overview
 

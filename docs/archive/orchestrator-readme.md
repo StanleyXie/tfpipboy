@@ -1,10 +1,10 @@
-# tf-pipboy Orchestrator
+# tfpipboy Orchestrator
 
 A powerful Terraform module orchestrator that manages complex infrastructure deployments with dependency-aware sequencing, parallel execution, and isolated environments.
 
 ## Overview
 
-The tf-pipboy orchestrator solves the challenge of managing multiple Terraform modules with complex dependencies. It provides:
+The tfpipboy orchestrator solves the challenge of managing multiple Terraform modules with complex dependencies. It provides:
 
 - **Dependency-aware execution**: Automatically determines the correct order to execute modules based on their dependencies
 - **Parallel execution**: Runs independent modules in parallel to reduce deployment time
@@ -48,8 +48,8 @@ The tf-pipboy orchestrator solves the challenge of managing multiple Terraform m
 Build from source:
 
 ```bash
-git clone https://github.com/StanleyXie/tf-pipboy.git
-cd tf-pipboy
+git clone https://github.com/StanleyXie/tfpipboy.git
+cd tfpipboy
 go build -o tfpipboy cmd/tfpipboy/main.go
 ```
 

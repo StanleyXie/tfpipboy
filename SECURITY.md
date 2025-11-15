@@ -9,7 +9,7 @@
 
 ## Reporting a Vulnerability
 
-We take the security of tf-pipboy seriously. If you believe you have found a security vulnerability, please report it to us as described below.
+We take the security of tfpipboy seriously. If you believe you have found a security vulnerability, please report it to us as described below.
 
 ### How to Report
 
@@ -37,17 +37,17 @@ This information will help us triage your report more quickly.
 
 ### Credentials and Secrets
 
-tf-pipboy **does not**:
+tfpipboy **does not**:
 - Store credentials
 - Transmit credentials over the network
 - Log credentials or sensitive data
 
-tf-pipboy **does**:
+tfpipboy **does**:
 - Check authentication status via official CLI tools (aws, az, gcloud, gh)
 - Read existing authentication state from CLI tools
 - Respect environment variables for authentication
 
-**Important:** tf-pipboy relies on existing authentication mechanisms. Ensure your:
+**Important:** tfpipboy relies on existing authentication mechanisms. Ensure your:
 - AWS credentials are properly secured
 - Azure CLI tokens are managed safely
 - GCP service accounts follow least-privilege principles
@@ -55,12 +55,12 @@ tf-pipboy **does**:
 
 ### Terraform State Files
 
-tf-pipboy interacts with Terraform state files which may contain sensitive information:
+tfpipboy interacts with Terraform state files which may contain sensitive information:
 
-- **Current behavior**: tf-pipboy executes Terraform commands that may read and write state files
+- **Current behavior**: tfpipboy executes Terraform commands that may read and write state files
 - **State location**: Supports both local and remote backends (S3, Azure Blob, GCS, etc.)
-- **State management**: tf-pipboy does not directly manipulate state files; all state operations go through Terraform
-- **No state data logging**: State content is never logged or transmitted by tf-pipboy
+- **State management**: tfpipboy does not directly manipulate state files; all state operations go through Terraform
+- **No state data logging**: State content is never logged or transmitted by tfpipboy
 - **Future capability**: Planned support for multi-state file management and visualization
 
 **Security recommendations:**
@@ -72,7 +72,7 @@ tf-pipboy interacts with Terraform state files which may contain sensitive infor
 
 ### Command Execution
 
-tf-pipboy executes Terraform commands:
+tfpipboy executes Terraform commands:
 
 - All Terraform commands run with user permissions
 - No privilege escalation
@@ -119,21 +119,21 @@ Project configuration files (`.tfpipboy/tfproject.yaml`) may contain:
 
 ### Local Execution Only
 
-tf-pipboy currently operates only on the local filesystem:
+tfpipboy currently operates only on the local filesystem:
 - No network communication (except Terraform itself)
 - No cloud API calls (except via Terraform and auth tools)
 - No telemetry or analytics
 
 ### Dependencies
 
-tf-pipboy uses the following external dependencies:
+tfpipboy uses the following external dependencies:
 - See `go.mod` for complete list
 - Dependencies are managed via Go modules
 - Regular security updates applied
 
 ### Filesystem Access
 
-tf-pipboy requires filesystem access to:
+tfpipboy requires filesystem access to:
 - Read Terraform configuration files
 - Execute Terraform binary
 - Read/write workspace directories
@@ -168,7 +168,7 @@ We ask that you:
 
 ## Security Best Practices for Users
 
-1. **Keep tf-pipboy updated** to the latest version
+1. **Keep tfpipboy updated** to the latest version
 2. **Run with minimal required permissions**
 3. **Audit configuration files** before sharing
 4. **Use encrypted backend storage** for Terraform state
@@ -181,12 +181,12 @@ We ask that you:
 
 ## Compliance
 
-tf-pipboy is designed to support:
+tfpipboy is designed to support:
 - SOC 2 compliance (when using appropriate backend and access controls)
 - GDPR compliance (no personal data collection)
 - HIPAA compliance (with appropriate Terraform backend configuration)
 
-Note: Compliance depends on how tf-pipboy is configured and used. Users are responsible for ensuring their specific configuration meets compliance requirements.
+Note: Compliance depends on how tfpipboy is configured and used. Users are responsible for ensuring their specific configuration meets compliance requirements.
 
 ## Contact
 

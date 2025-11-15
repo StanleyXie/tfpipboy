@@ -1,4 +1,4 @@
-module github.com/StanleyXie/tf-pipboy
+module github.com/StanleyXie/tfpipboy
 
 go 1.25.0
 

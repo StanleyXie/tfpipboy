@@ -1,6 +1,6 @@
 # Design Documentation Index
 
-This directory contains comprehensive design documentation for the tf-pipboy Configuration Format.
+This directory contains comprehensive design documentation for the tfpipboy Configuration Format.
 
 ## Quick Start
 

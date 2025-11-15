@@ -107,7 +107,7 @@ func (vr *ValidationResult) FormatReport() string {
 	return sb.String()
 }
 
-// ConfigParser handles parsing of tf-pipboy configuration files
+// ConfigParser handles parsing of tfpipboy configuration files
 type ConfigParser struct {
 	basePath string
 }

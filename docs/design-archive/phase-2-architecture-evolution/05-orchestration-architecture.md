@@ -2,7 +2,7 @@
 
 ## New Vision
 
-tf-pipboy evolves from a simple CLI wrapper to a **Terraform orchestration engine** that manages complex multi-module deployments across multiple environments with dependency management and parallel execution capabilities.
+tfpipboy evolves from a simple CLI wrapper to a **Terraform orchestration engine** that manages complex multi-module deployments across multiple environments with dependency management and parallel execution capabilities.
 
 ## Core Concepts
 
@@ -158,7 +158,7 @@ Level 2: [app] (runs after eks and rds)
 **Option A: Multiplexed Terminal View**
 ```
 ╭─────────────────────────────────────────────────────────────╮
-│ tf-pipboy Orchestration: dev environment                    │
+│ tfpipboy Orchestration: dev environment                    │
 ├─────────────────────────────────────────────────────────────┤
 │ Module    Status      Duration    Output                    │
 ├─────────────────────────────────────────────────────────────┤
@@ -323,9 +323,9 @@ const (
 - DRY configuration
 
 **Differences:**
-- tf-pipboy: Focus on terminal UX and parallel visibility
-- tf-pipboy: Built-in multi-session display
-- tf-pipboy: Ghostty-optimized features
+- tfpipboy: Focus on terminal UX and parallel visibility
+- tfpipboy: Built-in multi-session display
+- tfpipboy: Ghostty-optimized features
 - Terragrunt: More mature, production-ready
 - Terragrunt: AWS-centric features (S3 backend, etc.)
 
@@ -336,9 +336,9 @@ const (
 - Status tracking
 
 **Differences:**
-- tf-pipboy: Local execution, no SaaS
-- tf-pipboy: Terminal-native interface
-- tf-pipboy: Developer-focused
+- tfpipboy: Local execution, no SaaS
+- tfpipboy: Terminal-native interface
+- tfpipboy: Developer-focused
 - TF Cloud: Team collaboration features
 - TF Cloud: Remote execution and state management
 

@@ -1,4 +1,4 @@
-# Conversation Log - tf-pipboy Project
+# Conversation Log - tfpipboy Project
 
 ## Session 1: Initial Planning and Research
 **Date**: 2025-10-10  
@@ -8,7 +8,7 @@
 
 ### Summary
 
-Comprehensive research and planning session for tf-pipboy project. Created detailed design documentation covering technology stack selection, open-source component analysis, architecture design, and Ghostty terminal integration strategy.
+Comprehensive research and planning session for tfpipboy project. Created detailed design documentation covering technology stack selection, open-source component analysis, architecture design, and Ghostty terminal integration strategy.
 
 ---
 
@@ -286,7 +286,7 @@ Target: < 200ms total
 
 1. **Language Choice**: Go (production-ready, binary) or Python (rapid development)?
 2. **Distribution**: GitHub releases, Homebrew, package managers?
-3. **Branding**: Keep "tf-pipboy" name? Need logo?
+3. **Branding**: Keep "tfpipboy" name? Need logo?
 4. **Telemetry**: Usage analytics (opt-in) or completely offline?
 5. **License**: MIT or Apache 2.0?
 6. **Target Users**: Individual developers or teams?
@@ -301,7 +301,7 @@ Target: < 200ms total
 2. **Initialize Git repository**
 3. **Create project structure**:
    ```
-   tf-pipboy/
+   tfpipboy/
    ├── cmd/           # Main application
    ├── pkg/           # Library code
    │   ├── context/   # Context detection
