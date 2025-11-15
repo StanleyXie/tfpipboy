@@ -97,8 +97,8 @@ tfpipboy --operation destroy --targets networking,database
 
 ## Status
 
-**Current Version**: v0.6.0  
-**Status**: Core features complete, preparing for public release
+**Current Version**: v0.6.2-pre  
+**Status**: Core features complete, CI/CD stabilized, preparing for v1.0 release
 
 ### What's Implemented ✅
 
@@ -109,14 +109,17 @@ tfpipboy --operation destroy --targets networking,database
 - ✅ Configuration validation
 - ✅ Pipeline support
 - ✅ Isolated workspace management
+- ✅ Cross-platform support (Linux, macOS, Windows)
+- ✅ Comprehensive security validation (SBOM, vulnerability scanning)
+- ✅ Automated CI/CD with GitHub Actions
 
 ### Roadmap 🗺️
 
 See [ROADMAP.md](ROADMAP.md) for detailed project history and future plans.
 
-- **v0.7.0**: Documentation & stability
-- **v0.8.0**: Enhanced user experience
-- **v1.0.0**: Production release with Homebrew distribution
+- **v0.7.0**: Code quality improvements, address linter findings
+- **v0.8.0**: Enhanced documentation & user experience
+- **v1.0.0**: Production release with comprehensive testing
 
 ---
 
@@ -270,7 +273,7 @@ tfpipboy/
 
 ### Prerequisites
 
-- Go 1.21 or later
+- Go 1.23 or later
 - Terraform 1.0.0 or later
 - Make (optional but recommended)
 
@@ -307,11 +310,13 @@ We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for:
 
 ## Technology Stack
 
-- **Language**: Go 1.21+
+- **Language**: Go 1.23+
 - **CLI Framework**: Cobra
 - **TUI Framework**: Bubble Tea
 - **Styling**: Lip Gloss
 - **Build**: GoReleaser
+- **CI/CD**: GitHub Actions
+- **Security**: Gosec, Trivy, SBOM generation
 
 ---
 
