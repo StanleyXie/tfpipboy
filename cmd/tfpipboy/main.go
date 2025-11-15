@@ -11,10 +11,7 @@ import (
 	"time"
 
 	"github.com/StanleyXie/tfpipboy/pkg/orchestrator"
-)
-
-const (
-	version = "0.6.0"
+	"github.com/StanleyXie/tfpipboy/pkg/version"
 )
 
 func main() {
@@ -48,7 +45,7 @@ func main() {
 	flag.Parse()
 
 	if *showVersion {
-		fmt.Printf("tfpipboy version %s\n", version)
+		fmt.Printf("tfpipboy version %s\n", version.Version)
 		return
 	}
 

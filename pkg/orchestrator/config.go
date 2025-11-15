@@ -476,8 +476,9 @@ func (p *ConfigParser) validateModule(name string, module *Module, config *Confi
 
 // validateBackend validates backend configuration
 func (p *ConfigParser) validateBackend(item string, backend *BackendConfig, result *ValidationResult) {
+	// If no type is specified, skip validation
+	// This allows for partial backend configurations or inheritance
 	if backend.Type == "" {
-		result.AddError("backend", item, "type", "backend type is required")
 		return
 	}
 
@@ -673,7 +674,7 @@ func (p *ConfigParser) SaveConfig(config *Config, filename string) error {
 		return fmt.Errorf("failed to marshal config: %w", err)
 	}
 
-	if err := os.WriteFile(filename, data, 0644); err != nil {
+	if err := os.WriteFile(filename, data, 0600); err != nil {
 		return fmt.Errorf("failed to write config file: %w", err)
 	}
 
