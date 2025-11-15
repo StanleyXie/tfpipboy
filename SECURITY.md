@@ -2,198 +2,182 @@
 
 ## Supported Versions
 
+We release patches for security vulnerabilities in the following versions:
+
 | Version | Supported          |
 | ------- | ------------------ |
 | 0.6.x   | :white_check_mark: |
 | < 0.6   | :x:                |
 
+## Security Measures
+
+### Automated Security Scanning
+
+Every release undergoes comprehensive security validation:
+
+1. **Dependency Vulnerability Scanning** (Trivy)
+   - Scans all Go dependencies for known vulnerabilities
+   - Fails build on CRITICAL or HIGH severity issues
+   - Results uploaded to GitHub Security tab
+
+2. **Static Code Analysis** (Gosec)
+   - Detects common security issues in Go code
+   - Checks for hardcoded credentials, unsafe practices
+   - SARIF reports available in Security tab
+
+3. **Race Condition Detection**
+   - All tests run with `-race` flag
+   - Ensures thread-safe concurrent execution
+   - Critical for tfpipboy's parallel job execution
+
+4. **Software Bill of Materials (SBOM)**
+   - SPDX-format SBOM generated for every release
+   - Lists all dependencies and their versions
+   - Available in release assets as `sbom.spdx.json`
+
+5. **Binary Verification**
+   - SHA256 checksums for all release artifacts
+   - Available in `checksums.txt` in release assets
+   - Post-release binary scanning with Trivy
+
+### Manual Security Review
+
+Before each release, we perform:
+
+- Code review of security-sensitive changes
+- Verification of authentication handling
+- Review of Terraform state file access patterns
+- Validation of environment variable handling
+
+## Security Best Practices
+
+tfpipboy is designed with security in mind:
+
+### Read-Only Operations
+- **Never modifies Terraform state** - Only reads context information
+- **No credential storage** - Uses existing CLI tool authentication
+- **No configuration changes** - Never alters Terraform configs
+
+### Authentication
+- Relies on official CLI tools (aws, az, gcloud, gh)
+- Does not cache or store credentials
+- Authentication checks timeout after 2 seconds
+
+### Data Privacy
+- All context data stays local
+- No telemetry or data collection
+- Cache files stored with restricted permissions (0700)
+
+### Subprocess Execution
+- Uses Go's `os/exec` for secure subprocess handling
+- Properly sanitizes arguments passed to Terraform
+- Inherits environment variables safely
+
 ## Reporting a Vulnerability
 
-We take the security of tfpipboy seriously. If you believe you have found a security vulnerability, please report it to us as described below.
+We take security vulnerabilities seriously. If you discover a security issue, please follow these steps:
 
-### How to Report
+### Where to Report
 
-**Please do NOT report security vulnerabilities through public GitHub issues.**
+**DO NOT** open a public GitHub issue for security vulnerabilities.
 
-Instead, please report them via email to: [Your security contact email - TO BE ADDED]
+Instead, please report security issues via:
 
-You should receive a response within 48 hours. If for some reason you do not, please follow up via email to ensure we received your original message.
+1. **GitHub Security Advisories** (preferred)
+   - Go to: https://github.com/StanleyXie/tfpipboy/security/advisories/new
+   - Click "Report a vulnerability"
+
+2. **Email** (alternative)
+   - Send to: [stnaley.xie@outlook.com]
+   - Subject: "[SECURITY] tfpipboy vulnerability report"
 
 ### What to Include
 
-Please include the following information in your report:
+Please provide as much information as possible:
 
-- Type of vulnerability
-- Full paths of source file(s) related to the vulnerability
-- The location of the affected source code (tag/branch/commit or direct URL)
-- Any special configuration required to reproduce the issue
-- Step-by-step instructions to reproduce the issue
-- Proof-of-concept or exploit code (if possible)
-- Impact of the issue, including how an attacker might exploit it
+- **Vulnerability Description**: What is the security issue?
+- **Impact**: What could an attacker accomplish?
+- **Affected Versions**: Which versions are affected?
+- **Steps to Reproduce**: Detailed steps to reproduce the issue
+- **Proof of Concept**: Code or commands demonstrating the issue
+- **Suggested Fix**: If you have ideas for fixing the issue
 
-This information will help us triage your report more quickly.
+### What to Expect
 
-## Security Considerations
+- **Acknowledgment**: Within 48 hours
+- **Initial Assessment**: Within 5 business days
+- **Regular Updates**: At least every 7 days
+- **Disclosure Timeline**: 90 days from report (or earlier if fixed)
 
-### Credentials and Secrets
+### Our Process
 
-tfpipboy **does not**:
-- Store credentials
-- Transmit credentials over the network
-- Log credentials or sensitive data
+1. **Triage**: We'll confirm the vulnerability and assess severity
+2. **Fix Development**: We'll develop and test a fix
+3. **Private Testing**: We may ask you to verify the fix
+4. **Release**: We'll release a patched version
+5. **Public Disclosure**: We'll publish a security advisory
+6. **Credit**: We'll credit you (unless you prefer to remain anonymous)
 
-tfpipboy **does**:
-- Check authentication status via official CLI tools (aws, az, gcloud, gh)
-- Read existing authentication state from CLI tools
-- Respect environment variables for authentication
+## Security Advisories
 
-**Important:** tfpipboy relies on existing authentication mechanisms. Ensure your:
-- AWS credentials are properly secured
-- Azure CLI tokens are managed safely
-- GCP service accounts follow least-privilege principles
-- GitHub tokens have appropriate scopes
+Published security advisories are available at:
+https://github.com/StanleyXie/tfpipboy/security/advisories
 
-### Terraform State Files
+Subscribe to releases to be notified of security updates.
 
-tfpipboy interacts with Terraform state files which may contain sensitive information:
+## Dependency Security
 
-- **Current behavior**: tfpipboy executes Terraform commands that may read and write state files
-- **State location**: Supports both local and remote backends (S3, Azure Blob, GCS, etc.)
-- **State management**: tfpipboy does not directly manipulate state files; all state operations go through Terraform
-- **No state data logging**: State content is never logged or transmitted by tfpipboy
-- **Future capability**: Planned support for multi-state file management and visualization
+### Keeping Dependencies Updated
 
-**Security recommendations:**
-- Use remote backends with encryption at rest
-- Enable state locking to prevent concurrent modifications
-- Follow Terraform security best practices for state management
-- Implement proper access controls on state storage
-- Consider using encrypted backends (S3 with KMS, Azure with encryption, etc.)
+We use Dependabot to:
+- Monitor dependencies for known vulnerabilities
+- Automatically create PRs for security updates
+- Keep dependencies up-to-date
 
-### Command Execution
+### Verifying Releases
 
-tfpipboy executes Terraform commands:
+To verify the integrity of a release:
 
-- All Terraform commands run with user permissions
-- No privilege escalation
-- Command arguments are sanitized
-- Output is captured and filtered
+```bash
+# Download release and checksums
+VERSION=v0.6.0
+wget https://github.com/StanleyXie/tfpipboy/releases/download/${VERSION}/tfpipboy_Darwin_x86_64.tar.gz
+wget https://github.com/StanleyXie/tfpipboy/releases/download/${VERSION}/checksums.txt
 
-### Configuration Files
+# Verify checksum
+shasum -a 256 -c checksums.txt --ignore-missing
 
-Project configuration files (`.tfpipboy/tfproject.yaml`) may contain:
+# View SBOM
+wget https://github.com/StanleyXie/tfpipboy/releases/download/${VERSION}/sbom.spdx.json
+cat sbom.spdx.json
+```
 
-- Backend configurations
-- Module paths
-- Variable values
+## Security Testing
 
-**Best Practices:**
-- Do not commit secrets to configuration files
-- Use environment variables for sensitive values
-- Restrict file permissions on configuration directories
-- Use `.gitignore` to exclude sensitive configurations
+### Running Security Scans Locally
 
-## Security Features
+```bash
+# Install security tools
+go install github.com/securego/gosec/v2/cmd/gosec@latest
 
-### Input Validation
+# Run Gosec
+gosec ./...
 
-- Configuration file validation with error reporting
-- Path validation to prevent directory traversal
-- Workspace name sanitization
-- Variable value validation
+# Run tests with race detector
+go test -race ./...
 
-### Authentication Checks
+# Check for known vulnerabilities in dependencies
+go list -json -m all | docker run --rm -i sonatypecommunity/nancy:latest sleuth
+```
 
-- Automatic detection of expired credentials
-- Blocking execution on missing required authentication
-- Clear error messages for authentication failures
+### CI/CD Security Checks
 
-### Safe Defaults
+Every PR and commit to main runs:
+- Gosec static analysis
+- Race condition detection
+- Dependency vulnerability scanning
+- SARIF report upload to GitHub Security
 
-- Read-only access to Terraform state
-- No automatic approval of destructive operations
-- Explicit confirmation required for apply/destroy
-- Dry-run mode available for all operations
+## License
 
-## Known Security Considerations
-
-### Local Execution Only
-
-tfpipboy currently operates only on the local filesystem:
-- No network communication (except Terraform itself)
-- No cloud API calls (except via Terraform and auth tools)
-- No telemetry or analytics
-
-### Dependencies
-
-tfpipboy uses the following external dependencies:
-- See `go.mod` for complete list
-- Dependencies are managed via Go modules
-- Regular security updates applied
-
-### Filesystem Access
-
-tfpipboy requires filesystem access to:
-- Read Terraform configuration files
-- Execute Terraform binary
-- Read/write workspace directories
-- Create log files
-
-Ensure appropriate filesystem permissions are set.
-
-## Security Updates
-
-Security updates will be released as soon as possible after a vulnerability is confirmed.
-
-Updates will be announced via:
-- GitHub Security Advisories
-- Release notes
-- CHANGELOG.md
-
-## Disclosure Policy
-
-When we receive a security report, we will:
-
-1. Confirm receipt within 48 hours
-2. Provide an initial assessment within 7 days
-3. Work with the reporter to understand and reproduce the issue
-4. Develop and test a fix
-5. Release a security update
-6. Publicly disclose the vulnerability after a fix is available
-
-We ask that you:
-- Give us reasonable time to fix the issue before public disclosure
-- Make a good faith effort to avoid privacy violations and data destruction
-- Do not exploit the vulnerability beyond what is necessary to demonstrate it
-
-## Security Best Practices for Users
-
-1. **Keep tfpipboy updated** to the latest version
-2. **Run with minimal required permissions**
-3. **Audit configuration files** before sharing
-4. **Use encrypted backend storage** for Terraform state
-5. **Enable MFA** on cloud provider accounts
-6. **Rotate credentials regularly**
-7. **Review logs** for unexpected behavior
-8. **Use version control** for configuration files
-9. **Implement least-privilege access** for service accounts
-10. **Monitor authentication status** regularly
-
-## Compliance
-
-tfpipboy is designed to support:
-- SOC 2 compliance (when using appropriate backend and access controls)
-- GDPR compliance (no personal data collection)
-- HIPAA compliance (with appropriate Terraform backend configuration)
-
-Note: Compliance depends on how tfpipboy is configured and used. Users are responsible for ensuring their specific configuration meets compliance requirements.
-
-## Contact
-
-For security concerns, contact: [TO BE ADDED]
-
-For general questions: See [CONTRIBUTING.md](CONTRIBUTING.md)
-
----
-
-**Last Updated:** November 2024
+This security policy is licensed under CC-BY-4.0.
