@@ -53,9 +53,9 @@ Before each release, we perform:
 
 A comprehensive Gosec security audit was conducted in November 2024. The following issues were identified and addressed:
 
-### Fixed Issues
+### Fixed Issues (v0.6.1-pre)
 
-**File and Directory Permissions (25 MEDIUM)**
+**File and Directory Permissions (25 MEDIUM)** - ✅ FIXED
 
 All file and directory creation operations were hardened to use restrictive permissions:
 
@@ -71,11 +71,26 @@ All file and directory creation operations were hardened to use restrictive perm
 
 **Commit**: 3eba01f - "security: restrict file and directory permissions"
 
+### Current Scan Results (Post v0.6.1-pre)
+
+As of the latest scan, the following findings remain:
+
+**Summary**:
+- 4 MEDIUM: Subprocess execution (by design)
+- 18 MEDIUM: File inclusion (by design)
+- 1 LOW: Unsafe calls (future file)
+- 45+ LOW: Unhandled errors (acceptable risk)
+
 ### Accepted Risk Items
 
 The following Gosec findings are **by design** and represent intended functionality:
 
-**Subprocess Execution with Variables (4 MEDIUM)**
+**Subprocess Execution with Variables (4 MEDIUM)** - BY DESIGN
+
+Locations:
+- `pkg/tui/update.go:213, 100` - Self-update functionality
+- `pkg/cli/wrapper.go:412` - Shell command execution
+- `cmd/tfpipboy/main.go:936` - Terraform CLI invocation
 
 tfpipboy's core purpose is to orchestrate Terraform CLI executions. Subprocess execution is essential:
 
@@ -91,7 +106,12 @@ tfpipboy's core purpose is to orchestrate Terraform CLI executions. Subprocess e
   - Environment variables are inherited, not modified
   - All execution is synchronous and monitored
 
-**File Inclusion via Variables (18 MEDIUM)**
+**File Inclusion via Variables (18 MEDIUM)** - BY DESIGN
+
+Locations span:
+- `pkg/terraform/`: workspace.go, module.go, backend.go
+- `pkg/orchestrator/`: workspace.go, executor.go, config.go, display.go, logger.go, message_pipeline.go, message_router.go, orchestrator.go
+- `pkg/cli/`: wrapper.go
 
 tfpipboy must read user-provided Terraform modules and configuration files:
 
@@ -104,10 +124,23 @@ tfpipboy must read user-provided Terraform modules and configuration files:
 - **Mitigations**:
   - Workspace isolation prevents cross-contamination
   - File paths are validated and normalized
-  - symlink resolution prevents directory traversal
+  - Symlink resolution prevents directory traversal
   - All operations are logged
 
-**Risk Assessment**: These operations are **intentional and required** for tfpipboy's orchestration functionality. The tool operates in the user's security context and cannot perform actions the user couldn't perform directly with Terraform CLI.
+**Unhandled Errors (45+ LOW)** - ACCEPTABLE RISK
+
+Most unhandled errors fall into these categories:
+1. **Deferred Close() calls**: Errors from `defer file.Close()` are typically not actionable in cleanup paths
+2. **Write operations in error handlers**: Failures writing debug/error logs don't affect primary operations
+3. **Non-critical I/O**: File writes for diagnostics where failure doesn't impact functionality
+
+These are standard Go practices where error handling would add complexity without meaningful benefit.
+
+**Unsafe Calls (1 LOW)** - FUTURE FILE
+
+- `pkg/cli/wrapper_unix.go:25`: File does not exist in current codebase
+
+**Risk Assessment**: The MEDIUM findings are **intentional and required** for tfpipboy's orchestration functionality. The LOW findings represent standard Go patterns with acceptable risk trade-offs. The tool operates in the user's security context and cannot perform actions the user couldn't perform directly with Terraform CLI.
 
 ## Security Best Practices
 
