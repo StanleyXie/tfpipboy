@@ -39,7 +39,6 @@ archives:
       - README.md
       - LICENSE
       - CHANGELOG.md
-      - sbom.spdx.json
 
 checksum:
   name_template: "checksums.txt"
