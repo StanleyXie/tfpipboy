@@ -41,7 +41,8 @@ jobs:
         run: go mod verify
 
       - name: Run tests
-        run: go test -v -race -coverprofile=coverage.out -covermode=atomic ./...
+        run: |
+          go test -v -race -coverprofile=coverage.out -covermode=atomic ./...
 
       - name: Upload coverage to Codecov
         if: matrix.os == 'ubuntu-latest'
@@ -68,8 +69,9 @@ jobs:
       - name: Run golangci-lint
         uses: golangci/golangci-lint-action@v4
         with:
-          version: latest
+          version: v1.62.2
           args: --timeout=5m
+          install-mode: binary
 
   build:
     name: Build
