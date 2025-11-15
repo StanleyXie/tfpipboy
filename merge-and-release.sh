@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Script to merge security fixes and trigger v0.6.1-pre release
+# Script to merge security fixes and trigger v0.6.2 production release
 # Run this from your local machine to complete the release process
 #
 
@@ -13,7 +13,7 @@ YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
 echo -e "${BLUE}========================================${NC}"
-echo -e "${BLUE}  Merge and Release v0.6.1-pre${NC}"
+echo -e "${BLUE}  Merge and Release v0.6.2${NC}"
 echo -e "${BLUE}========================================${NC}"
 echo ""
 
@@ -32,13 +32,13 @@ echo ""
 
 # Step 3: Merge feature branch
 echo -e "${YELLOW}Step 3/4: Merging security fixes...${NC}"
-if git merge origin/claude/review-cli-wrapper-01SGi2ciK13nqvJi1HweKKFG --no-ff -m "Merge security fixes and documentation for v0.6.1-pre
+if git merge origin/claude/review-cli-wrapper-01SGi2ciK13nqvJi1HweKKFG --no-ff -m "Merge security fixes and documentation for v0.6.2 production release
 
 This merge includes:
 - Terminal rendering fixes for non-TTY environments (bc32185)
 - File and directory permission hardening (3eba01f)
 - Security audit documentation (828e156, 6c2ca26)
-- Release documentation for v0.6.1-pre (ff14ceb)
+- Production release documentation for v0.6.2
 
 Security improvements:
 - Fixed all 25 MEDIUM file permission vulnerabilities
@@ -46,7 +46,9 @@ Security improvements:
 - Added comprehensive security scan analysis
 
 All remaining MEDIUM findings are intentional design choices required
-for Terraform orchestration functionality."; then
+for Terraform orchestration functionality.
+
+This is a production release (not pre-release)."; then
     echo -e "${GREEN}✓ Merge successful${NC}"
 else
     echo -e "${YELLOW}Note: Merge may have already been completed${NC}"
@@ -60,16 +62,17 @@ echo -e "${GREEN}✓ Push complete${NC}"
 echo ""
 
 # Optional: Create and push tag
-echo -e "${YELLOW}Optional: Create git tag v0.6.1-pre?${NC}"
+echo -e "${YELLOW}Optional: Create git tag v0.6.2?${NC}"
 echo "This step is optional. Your release workflow may create the tag automatically."
 read -p "Create and push tag? (y/N): " -n 1 -r
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]; then
-    echo -e "${YELLOW}Creating tag v0.6.1-pre...${NC}"
+    echo -e "${YELLOW}Creating tag v0.6.2...${NC}"
 
-    if git tag -a v0.6.1-pre -m "Release v0.6.1-pre: Security fixes and terminal rendering improvements
+    if git tag -a v0.6.2 -m "Release v0.6.2: Production release with security fixes and terminal rendering improvements
 
 Release Highlights:
+- Production release (not pre-release)
 - Fixed repeated frame rendering in non-TTY environments
 - Hardened file/directory permissions (25 security fixes)
 - Comprehensive security audit documentation
@@ -77,7 +80,8 @@ Release Highlights:
 Security Improvements:
 - File permissions: 0644 → 0600 (prevents unauthorized reads)
 - Directory permissions: 0755 → 0750 (restricts directory listing)
-- All changes documented in SECURITY.md
+- All security findings documented in SECURITY.md
+- Accepted risks clearly explained with mitigations
 
 Bug Fixes:
 - Terminal rendering now properly detects TTY vs non-TTY environments
@@ -85,15 +89,15 @@ Bug Fixes:
 - Non-TTY output shows only start/end frames (prevents spam)
 
 Technical Changes:
-- Added golang.org/x/term for TTY detection
+- Added golang.org/x/term v0.37.0 for TTY detection
 - Dual rendering strategy for different output contexts
 - Enhanced cursor position tracking for clean updates
 
-See RELEASE_v0.6.1-pre.md for full details."; then
+See RELEASE_v0.6.2.md for full details."; then
         echo -e "${GREEN}✓ Tag created${NC}"
 
         echo -e "${YELLOW}Pushing tag to remote...${NC}"
-        git push origin v0.6.1-pre
+        git push origin v0.6.2
         echo -e "${GREEN}✓ Tag pushed${NC}"
     else
         echo -e "${YELLOW}Note: Tag may already exist${NC}"
@@ -112,11 +116,14 @@ echo "1. Monitor the GitHub Actions workflow at:"
 echo "   https://github.com/StanleyXie/tfpipboy/actions"
 echo ""
 echo "2. Once the workflow completes, check the release at:"
-echo "   https://github.com/StanleyXie/tfpipboy/releases/tag/v0.6.1-pre"
+echo "   https://github.com/StanleyXie/tfpipboy/releases/tag/v0.6.2"
 echo ""
 echo "3. Verify the release includes:"
 echo "   - Linux binaries (x86_64, arm64)"
 echo "   - macOS binaries (x86_64, arm64)"
 echo "   - SHA256 checksums"
 echo "   - SBOM (Software Bill of Materials)"
+echo ""
+echo "4. This is a PRODUCTION release (not pre-release)"
+echo "   Ensure it's marked as the latest release on GitHub"
 echo ""
