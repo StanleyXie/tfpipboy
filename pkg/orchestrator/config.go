@@ -476,8 +476,9 @@ func (p *ConfigParser) validateModule(name string, module *Module, config *Confi
 
 // validateBackend validates backend configuration
 func (p *ConfigParser) validateBackend(item string, backend *BackendConfig, result *ValidationResult) {
+	// If no type is specified, skip validation
+	// This allows for partial backend configurations or inheritance
 	if backend.Type == "" {
-		result.AddError("backend", item, "type", "backend type is required")
 		return
 	}
 
