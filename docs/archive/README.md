@@ -1,6 +1,6 @@
 # Historical Archive
 
-This directory contains historical documents from the tf-pipboy development process, including status reports, planning documents, and milestone summaries.
+This directory contains historical documents from the tfpipboy development process, including status reports, planning documents, and milestone summaries.
 
 ## Purpose
 

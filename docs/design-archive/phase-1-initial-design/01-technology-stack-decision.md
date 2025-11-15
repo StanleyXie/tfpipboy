@@ -6,7 +6,7 @@
 
 ## Overview
 
-This document analyzes language and framework options for implementing tf-pipboy, a context-aware Terraform CLI wrapper.
+This document analyzes language and framework options for implementing tfpipboy, a context-aware Terraform CLI wrapper.
 
 ## Requirements Summary
 

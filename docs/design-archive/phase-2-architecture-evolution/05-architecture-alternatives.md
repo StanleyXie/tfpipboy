@@ -1,11 +1,11 @@
 # Architecture Alternatives: CLI Wrapper vs Terminal Emulator
 
 **Date**: 2025-10-10  
-**Purpose**: Analyze two fundamentally different architectural approaches for tf-pipboy
+**Purpose**: Analyze two fundamentally different architectural approaches for tfpipboy
 
 ## The Question
 
-**Should tf-pipboy be:**
+**Should tfpipboy be:**
 1. A **CLI wrapper** that wraps `terraform` commands, OR
 2. A **terminal emulator wrapper** that intercepts all commands in a custom terminal?
 
@@ -17,7 +17,7 @@
 ```
 User types: tfpipboy plan
          ↓
-   CLI Wrapper (tf-pipboy)
+   CLI Wrapper (tfpipboy)
          ↓
    Detect Context (read files, check auth)
          ↓
@@ -28,7 +28,7 @@ User types: tfpipboy plan
 
 ### How It Works
 - User replaces `terraform` with `tfpipboy` in their commands
-- tf-pipboy detects context before each command
+- tfpipboy detects context before each command
 - Passes through to real terraform
 - Works in any terminal emulator
 
@@ -86,7 +86,7 @@ User types: tfpipboy plan
 
 ### Architecture
 ```
-User starts: tf-pipboy-terminal
+User starts: tfpipboy-terminal
          ↓
    Custom Terminal Emulator
    (based on Ghostty/libghostty)
@@ -101,7 +101,7 @@ User starts: tf-pipboy-terminal
 ```
 
 ### How It Works
-- User launches tf-pipboy as their terminal
+- User launches tfpipboy as their terminal
 - Terminal intercepts every command typed
 - Builds state by watching commands and output
 - Persistent context display (status bar)
@@ -465,7 +465,7 @@ Use Ghostty's **existing features**:
 # ghostty config
 shell-integration = true
 
-# Custom keybinding to show tf-pipboy status
+# Custom keybinding to show tfpipboy status
 keybind = ctrl+shift+t=text:tfpipboy status\n
 ```
 
@@ -474,13 +474,13 @@ Then in your shell:
 # Add to .zshrc
 precmd() {
     # Update terminal title
-    print -Pn "\e]0;tf-pipboy: $(tfpipboy status --short)\a"
+    print -Pn "\e]0;tfpipboy: $(tfpipboy status --short)\a"
 }
 ```
 
 **Result**: Best of both worlds
 - Keep Ghostty as terminal
-- tf-pipboy shows in title bar
+- tfpipboy shows in title bar
 - No custom terminal needed
 
 ---

@@ -1,10 +1,10 @@
 # Guide: Extending the TUI
 
-This guide explains how to extend the TUI (Terminal User Interface) in tf-pipboy to add new features, views, and interactive components.
+This guide explains how to extend the TUI (Terminal User Interface) in tfpipboy to add new features, views, and interactive components.
 
 ## Overview
 
-tf-pipboy uses the [Bubble Tea](https://github.com/charmbracelet/bubbletea) framework, which follows the Elm architecture:
+tfpipboy uses the [Bubble Tea](https://github.com/charmbracelet/bubbletea) framework, which follows the Elm architecture:
 
 - **Model**: Application state
 - **Update**: Handles messages and updates state
@@ -674,7 +674,7 @@ func (m Model) View() string {
 
 func (m Model) renderHelp() string {
 	help := `
-tf-pipboy Help
+tfpipboy Help
 
 Keyboard Shortcuts:
   ?        Toggle this help

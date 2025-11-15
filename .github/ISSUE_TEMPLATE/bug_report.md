@@ -35,7 +35,7 @@ assignees: ''
 ## Environment
 
 - **OS**: <!-- e.g., macOS 14.0, Ubuntu 22.04, Windows 11 -->
-- **tf-pipboy Version**: <!-- Run: tfpipboy --version -->
+- **tfpipboy Version**: <!-- Run: tfpipboy --version -->
 - **Go Version**: <!-- Run: go version -->
 - **Terminal**: <!-- e.g., iTerm2, Windows Terminal, Ghostty -->
 - **Shell**: <!-- e.g., bash, zsh, fish -->

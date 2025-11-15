@@ -4,7 +4,7 @@
 **Date**: November 2, 2025  
 **Version**: 0.2.0  
 **Tag**: v0.2.0  
-**Repository**: https://github.com/StanleyXie/tf-pipboy
+**Repository**: https://github.com/StanleyXie/tfpipboy
 
 ---
 
@@ -26,7 +26,7 @@
 
 ### 3. Build & Test
 - ✅ Binary built successfully
-- ✅ Version verified: `tf-pipboy version 0.2.0`
+- ✅ Version verified: `tfpipboy version 0.2.0`
 - ✅ Execution tested with demo project
 
 ---
@@ -41,8 +41,8 @@
 ### View Release
 ```bash
 # Clone and checkout release
-git clone https://github.com/StanleyXie/tf-pipboy.git
-cd tf-pipboy
+git clone https://github.com/StanleyXie/tfpipboy.git
+cd tfpipboy
 git checkout v0.2.0
 
 # Build
@@ -50,7 +50,7 @@ go build -o tfpipboy cmd/tfpipboy/main.go
 
 # Verify
 ./tfpipboy --version
-# Output: tf-pipboy version 0.2.0
+# Output: tfpipboy version 0.2.0
 ```
 
 ---
@@ -118,7 +118,7 @@ Do you want to proceed with this execution plan? (yes/no):
 ## 🎯 Next Steps (Optional)
 
 ### Create GitHub Release Page
-1. Go to: https://github.com/StanleyXie/tf-pipboy/releases
+1. Go to: https://github.com/StanleyXie/tfpipboy/releases
 2. Click "Draft a new release"
 3. Choose tag: v0.2.0
 4. Title: "Release v0.2.0: Instance-Based Orchestration"
@@ -159,8 +159,8 @@ The release v0.2.0 has been successfully completed and pushed to GitHub!
 ### Quick Test
 ```bash
 # Clone the release
-git clone https://github.com/StanleyXie/tf-pipboy.git
-cd tf-pipboy
+git clone https://github.com/StanleyXie/tfpipboy.git
+cd tfpipboy
 git checkout v0.2.0
 
 # Build and test
@@ -176,7 +176,7 @@ cd examples/demo-project
 
 **Release Engineer**: Claude  
 **Release Date**: November 2, 2025  
-**Repository**: https://github.com/StanleyXie/tf-pipboy  
+**Repository**: https://github.com/StanleyXie/tfpipboy  
 **Tag**: v0.2.0  
 
 🎉 **Congratulations on the release!**

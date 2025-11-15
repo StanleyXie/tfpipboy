@@ -2,7 +2,7 @@
 
 ## Overview
 
-tf-pipboy provides flexible control over parallel execution of Terraform modules at both global and instance levels. You can execute multiple instances in parallel for faster deployments while maintaining fine-grained control over which instances can run concurrently.
+tfpipboy provides flexible control over parallel execution of Terraform modules at both global and instance levels. You can execute multiple instances in parallel for faster deployments while maintaining fine-grained control over which instances can run concurrently.
 
 ## Features
 

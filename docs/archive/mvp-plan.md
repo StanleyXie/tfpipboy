@@ -1,4 +1,4 @@
-# tf-pipboy MVP Development Plan
+# tfpipboy MVP Development Plan
 
 **Version**: 1.0  
 **Date**: 2025-10-10  
@@ -176,7 +176,7 @@ These features are explicitly **NOT** in MVP:
 
 #### US-001: Launch TUI Application
 **As a** DevOps engineer  
-**I want to** launch tf-pipboy TUI application  
+**I want to** launch tfpipboy TUI application  
 **So that** I can see my Terraform context in a persistent interface
 
 **Acceptance Criteria**:
@@ -206,7 +206,7 @@ These features are explicitly **NOT** in MVP:
 
 **Acceptance Criteria**:
 - Given I am logged into Azure CLI
-- When I launch tf-pipboy
+- When I launch tfpipboy
 - Then I see "✓ Azure: user@example.com (Subscription: Production)"
 - And the status refreshes every 5 seconds
 - Given I am NOT logged into Azure CLI
@@ -233,7 +233,7 @@ These features are explicitly **NOT** in MVP:
 
 **Acceptance Criteria**:
 - Given I am logged into GitHub CLI
-- When I launch tf-pipboy
+- When I launch tfpipboy
 - Then I see "✓ GitHub: octocat"
 - Given I am NOT logged into GitHub CLI
 - Then I see "✗ GitHub: Not authenticated"
@@ -261,7 +261,7 @@ These features are explicitly **NOT** in MVP:
 
 **Acceptance Criteria**:
 - Given I am in a Terraform directory with workspace "production"
-- When I launch tf-pipboy
+- When I launch tfpipboy
 - Then I see "Workspace: production" in the status bar
 - Given I am not in a Terraform directory
 - Then I see "Workspace: N/A"
@@ -285,7 +285,7 @@ These features are explicitly **NOT** in MVP:
 
 **Acceptance Criteria**:
 - Given I am in a Terraform directory with S3 backend
-- When I launch tf-pipboy
+- When I launch tfpipboy
 - Then I see "Backend: s3 (my-bucket/terraform.tfstate)"
 - Given backend is local
 - Then I see "Backend: local"
@@ -309,7 +309,7 @@ These features are explicitly **NOT** in MVP:
 
 **Acceptance Criteria**:
 - Given I am in `/home/user/infra/azure/aks`
-- When I launch tf-pipboy
+- When I launch tfpipboy
 - Then I see "Module: azure/aks" or full path based on config
 
 **Tasks**:
@@ -332,7 +332,7 @@ These features are explicitly **NOT** in MVP:
 
 **Acceptance Criteria**:
 - Given I have `TF_VAR_environment=staging` set
-- When I launch tf-pipboy
+- When I launch tfpipboy
 - Then I see environment variables section showing "TF_VAR_environment=staging"
 - And I can expand/collapse the section
 
@@ -447,7 +447,7 @@ These features are explicitly **NOT** in MVP:
 
 **Acceptance Criteria**:
 - Given Terraform is not installed
-- When I launch tf-pipboy
+- When I launch tfpipboy
 - Then I see "⚠ Terraform not found. Please install from https://terraform.io"
 - Given Azure CLI is not installed
 - Then I see "⚠ Azure CLI not found. Auth status unavailable."

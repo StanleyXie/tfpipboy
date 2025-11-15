@@ -1,11 +1,11 @@
 # Security Pre-Release Checklist
 
-This checklist must be completed before making the tf-pipboy repository public.
+This checklist must be completed before making the tfpipboy repository public.
 
 ## ✅ Completed Items
 
 ### 1. Examples Directory
-- [x] Examples moved to `../tf-pipboy-examples` (outside repo)
+- [x] Examples moved to `../tfpipboy-examples` (outside repo)
 - [x] Symlink created for local development access
 - [x] `.gitignore` configured to exclude `examples/`
 - [x] All example files removed from git history in current branch

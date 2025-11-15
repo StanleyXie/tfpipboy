@@ -49,7 +49,7 @@ build/
 
 # Claude Code
 
-# tf-pipboy specific (user config directories, not examples)
+# tfpipboy specific (user config directories, not examples)
 /.tfpipboy/
 *.tfpipboy.cache
 

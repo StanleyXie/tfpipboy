@@ -3,8 +3,8 @@ package tui
 import (
 	"time"
 
-	"github.com/StanleyXie/tf-pipboy/pkg/auth"
-	"github.com/StanleyXie/tf-pipboy/pkg/terraform"
+	"github.com/StanleyXie/tfpipboy/pkg/auth"
+	"github.com/StanleyXie/tfpipboy/pkg/terraform"
 	"github.com/charmbracelet/bubbles/textinput"
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
@@ -42,12 +42,12 @@ func NewModel() Model {
 	ti.PromptStyle = ti.PromptStyle.Foreground(ti.PromptStyle.GetForeground())
 
 	vp := viewport.New(80, 20)
-	vp.SetContent("Welcome to tf-pipboy!\n\nType any command and press Enter to execute.\nExamples:\n  terraform version\n  terraform init\n  ls -la")
+	vp.SetContent("Welcome to tfpipboy!\n\nType any command and press Enter to execute.\nExamples:\n  terraform version\n  terraform init\n  ls -la")
 	vp.MouseWheelEnabled = true
 	vp.MouseWheelDelta = 3
 
 	return Model{
-		statusBar:      "tf-pipboy - Loading...",
+		statusBar:      "tfpipboy - Loading...",
 		textInput:      ti,
 		viewport:       vp,
 		output:         []string{},

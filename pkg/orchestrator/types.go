@@ -4,7 +4,7 @@ import (
 	"time"
 )
 
-// Config represents the complete tf-pipboy configuration
+// Config represents the complete tfpipboy configuration
 type Config struct {
 	Version   string               `yaml:"version"`
 	Modules   map[string]*Module   `yaml:"modules"`

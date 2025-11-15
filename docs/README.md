@@ -1,6 +1,6 @@
-# tf-pipboy Documentation
+# tfpipboy Documentation
 
-Welcome to the tf-pipboy documentation! This directory contains all user and developer documentation for the project.
+Welcome to the tfpipboy documentation! This directory contains all user and developer documentation for the project.
 
 ## Quick Links
 

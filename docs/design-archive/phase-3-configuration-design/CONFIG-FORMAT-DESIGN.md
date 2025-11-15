@@ -5,7 +5,7 @@
 
 ## Executive Summary
 
-This document defines the declarative configuration format for tf-pipboy's pipeline orchestration system. The design follows the **DRY principle** (Don't Repeat Yourself) with a **three-layer hierarchy**:
+This document defines the declarative configuration format for tfpipboy's pipeline orchestration system. The design follows the **DRY principle** (Don't Repeat Yourself) with a **three-layer hierarchy**:
 
 1. **Variables Layer** (`variables.yaml`) - Shared variables and defaults
 2. **Modules Layer** (`modules.yaml`) - Module definitions and configurations

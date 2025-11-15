@@ -1,10 +1,10 @@
-# Getting Started with tf-pipboy
+# Getting Started with tfpipboy
 
-Welcome to tf-pipboy! This guide will help you get up and running quickly.
+Welcome to tfpipboy! This guide will help you get up and running quickly.
 
-## What is tf-pipboy?
+## What is tfpipboy?
 
-tf-pipboy is a Terraform orchestration tool that helps you manage complex, multi-module infrastructure deployments with:
+tfpipboy is a Terraform orchestration tool that helps you manage complex, multi-module infrastructure deployments with:
 
 - **Parallel Execution**: Run independent modules concurrently
 - **Dependency Management**: Automatic execution ordering based on dependencies
@@ -42,15 +42,15 @@ tfpipboy --version
 ### Option 2: Go Install
 
 ```bash
-go install github.com/StanleyXie/tf-pipboy/cmd/tfpipboy@latest
+go install github.com/StanleyXie/tfpipboy/cmd/tfpipboy@latest
 ```
 
 ### Option 3: Build from Source
 
 ```bash
 # Clone the repository
-git clone https://github.com/StanleyXie/tf-pipboy.git
-cd tf-pipboy
+git clone https://github.com/StanleyXie/tfpipboy.git
+cd tfpipboy
 
 # Build
 make build
@@ -169,10 +169,10 @@ tfpipboy --operation destroy --targets application,database
 
 ## Understanding the Live Board
 
-tf-pipboy includes a beautiful TUI (Text User Interface) that shows real-time status:
+tfpipboy includes a beautiful TUI (Text User Interface) that shows real-time status:
 
 ```
-╭─────────────────────── tf-pipboy Status ───────────────────────╮
+╭─────────────────────── tfpipboy Status ───────────────────────╮
 │ Project: my-infrastructure                                     │
 │ Operation: apply          Concurrent: 3                        │
 ╰────────────────────────────────────────────────────────────────╯
@@ -363,8 +363,8 @@ Now that you have the basics:
 ## Getting Help
 
 - **Documentation**: [docs/](../docs/)
-- **Issues**: [GitHub Issues](https://github.com/StanleyXie/tf-pipboy/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/StanleyXie/tf-pipboy/discussions)
+- **Issues**: [GitHub Issues](https://github.com/StanleyXie/tfpipboy/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/StanleyXie/tfpipboy/discussions)
 
 ---
 

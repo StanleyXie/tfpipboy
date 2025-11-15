@@ -9,11 +9,11 @@
 
 ### ✅ Git Workflow
 - **Branch**: `develop` (created and pushed to remote)
-- **Remote**: https://github.com/StanleyXie/tf-pipboy
+- **Remote**: https://github.com/StanleyXie/tfpipboy
 - **Workflow**: Git Flow (main → develop → feature branches)
 
 ### ✅ Go Project
-- **Module**: `github.com/StanleyXie/tf-pipboy`
+- **Module**: `github.com/StanleyXie/tfpipboy`
 - **Go Version**: 1.25.0
 - **Dependencies Installed**:
   - `github.com/charmbracelet/bubbletea@v1.3.10` (TUI framework)
@@ -22,7 +22,7 @@
 
 ### ✅ Project Structure
 ```
-tf-pipboy/
+tfpipboy/
 ├── cmd/
 │   └── tfpipboy/
 │       └── main.go              ✅ Application entry point
@@ -74,7 +74,7 @@ tf-pipboy/
 
 ### Run the Application
 ```bash
-cd /Users/stanleyxie/Workspace/Projects/tf-pipboy
+cd /Users/stanleyxie/Workspace/Projects/tfpipboy
 make run
 ```
 
@@ -239,7 +239,7 @@ All documentation is ready:
 - `develop`: Current development (✅ ready)
 
 ### Remote
-- Origin: https://github.com/StanleyXie/tf-pipboy.git
+- Origin: https://github.com/StanleyXie/tfpipboy.git
 - Develop branch pushed and tracking
 
 ### Last Commit
@@ -277,8 +277,8 @@ All documentation is ready:
 
 ```
 Go Version:    1.25.0 darwin/arm64
-Project Path:  /Users/stanleyxie/Workspace/Projects/tf-pipboy
-Module:        github.com/StanleyXie/tf-pipboy
+Project Path:  /Users/stanleyxie/Workspace/Projects/tfpipboy
+Module:        github.com/StanleyXie/tfpipboy
 Branch:        develop
 Remote:        origin (GitHub)
 Status:        ✅ Clean, all changes committed and pushed

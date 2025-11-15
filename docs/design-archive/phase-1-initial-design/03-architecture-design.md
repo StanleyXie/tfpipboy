@@ -1,11 +1,11 @@
-# tf-pipboy Architecture Design
+# tfpipboy Architecture Design
 
 **Date**: 2025-10-10  
 **Version**: 1.0 (Initial Design)
 
 ## System Overview
 
-tf-pipboy is a context-aware Terraform CLI wrapper that provides real-time visibility into:
+tfpipboy is a context-aware Terraform CLI wrapper that provides real-time visibility into:
 - Terraform runtime environment (backend, state, workspace, module)
 - Cloud provider authentication status (AWS, Azure, GCP, GitHub)
 - Current working context
@@ -235,7 +235,7 @@ class ContextAggregator:
 
 #### Mode 1: Header Display (Default)
 ```
-╭─────────────────────── tf-pipboy context ───────────────────────╮
+╭─────────────────────── tfpipboy context ───────────────────────╮
 │ Module:    aws/vpc                    Workspace: production     │
 │ Backend:   s3://my-terraform-state/vpc                          │
 │ Auth:      ✓ AWS (123456789012)  ✓ Azure  ✗ GCP  ✓ GitHub     │
@@ -247,7 +247,7 @@ Running: terraform plan -out=plan.tfplan
 
 #### Mode 2: Minimal Display
 ```
-[tf-pipboy] production @ aws/vpc | ✓ AWS ✓ Azure
+[tfpipboy] production @ aws/vpc | ✓ AWS ✓ Azure
 Running: terraform plan
 ```
 

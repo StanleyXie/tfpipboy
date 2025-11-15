@@ -1,4 +1,4 @@
-# ADR-001: Architecture Decision for tf-pipboy
+# ADR-001: Architecture Decision for tfpipboy
 
 **Status**: Accepted  
 **Date**: 2025-10-10  
@@ -9,7 +9,7 @@
 
 ## Context
 
-We need to build **tf-pipboy**, a context-aware Terraform CLI tool that provides real-time visibility into:
+We need to build **tfpipboy**, a context-aware Terraform CLI tool that provides real-time visibility into:
 - Terraform runtime environment (backend, state, workspace, module)
 - Cloud provider authentication status (AWS, Azure, GCP, GitHub)
 - OS-level environment variables

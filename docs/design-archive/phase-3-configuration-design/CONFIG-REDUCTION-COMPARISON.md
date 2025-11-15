@@ -1,6 +1,6 @@
 # Configuration Reduction: Before vs After
 
-This document shows the actual reduction achieved by the new tf-pipboy configuration format using real Azure Landing Zone deployment data.
+This document shows the actual reduction achieved by the new tfpipboy configuration format using real Azure Landing Zone deployment data.
 
 ## Executive Summary
 

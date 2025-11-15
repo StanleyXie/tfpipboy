@@ -1,10 +1,10 @@
 # Configuration Reference
 
-Complete reference for tf-pipboy configuration files.
+Complete reference for tfpipboy configuration files.
 
 ## Overview
 
-tf-pipboy uses YAML-based configuration stored in the `.tfpipboy/` directory. The main configuration file is `tfproject.yaml`.
+tfpipboy uses YAML-based configuration stored in the `.tfpipboy/` directory. The main configuration file is `tfproject.yaml`.
 
 ## Configuration File Location
 
@@ -537,7 +537,7 @@ pipelines:
 
 ## Validation
 
-tf-pipboy validates configuration before execution:
+tfpipboy validates configuration before execution:
 
 - **Schema validation**: Ensures required fields are present
 - **Dependency validation**: Detects circular dependencies
@@ -675,4 +675,4 @@ instances:
 
 ---
 
-**Questions?** See [GitHub Discussions](https://github.com/StanleyXie/tf-pipboy/discussions)
+**Questions?** See [GitHub Discussions](https://github.com/StanleyXie/tfpipboy/discussions)

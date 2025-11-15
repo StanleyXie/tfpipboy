@@ -1,6 +1,6 @@
 # Instance Configuration Flexibility Examples
 
-The instance-based model in tf-pipboy is designed to be flexible and customizable for various use cases. Environment and region are first-class fields but are entirely optional.
+The instance-based model in tfpipboy is designed to be flexible and customizable for various use cases. Environment and region are first-class fields but are entirely optional.
 
 ## Example 1: Multi-Environment, Multi-Region (Azure Landing Zone)
 

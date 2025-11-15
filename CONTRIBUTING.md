@@ -1,6 +1,6 @@
-# Contributing to tf-pipboy
+# Contributing to tfpipboy
 
-Thank you for your interest in contributing to tf-pipboy! This document provides guidelines and instructions for contributing.
+Thank you for your interest in contributing to tfpipboy! This document provides guidelines and instructions for contributing.
 
 ## Development Setup
 
@@ -17,14 +17,14 @@ Thank you for your interest in contributing to tf-pipboy! This document provides
 
 ```bash
 # Fork the repository on GitHub, then clone your fork
-git clone https://github.com/YOUR_USERNAME/tf-pipboy.git
-cd tf-pipboy
+git clone https://github.com/YOUR_USERNAME/tfpipboy.git
+cd tfpipboy
 ```
 
 2. **Add Upstream Remote**
 
 ```bash
-git remote add upstream https://github.com/StanleyXie/tf-pipboy.git
+git remote add upstream https://github.com/StanleyXie/tfpipboy.git
 ```
 
 3. **Setup Development Environment**
@@ -311,7 +311,7 @@ What you expected to happen.
 **Environment**
 - OS: [e.g., macOS 14.0]
 - Go version: [e.g., 1.21.0]
-- tf-pipboy version: [e.g., v0.1.0]
+- tfpipboy version: [e.g., v0.1.0]
 
 **Additional context**
 Any other relevant information.
@@ -362,7 +362,7 @@ Any other relevant information.
 ## Getting Help
 
 - Check existing [documentation](./docs/)
-- Search [issues](https://github.com/StanleyXie/tf-pipboy/issues)
+- Search [issues](https://github.com/StanleyXie/tfpipboy/issues)
 - Create a new issue with your question
 - Join discussions
 
@@ -373,4 +373,4 @@ Contributors will be recognized in:
 - Release notes for their contributions
 - CONTRIBUTORS.md file (coming soon)
 
-Thank you for contributing to tf-pipboy! 🎉
+Thank you for contributing to tfpipboy! 🎉

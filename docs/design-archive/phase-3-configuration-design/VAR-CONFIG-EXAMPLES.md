@@ -1,6 +1,6 @@
 # Variable Configuration Examples
 
-This document demonstrates all the ways to configure variables in tf-pipboy's `var-config` section.
+This document demonstrates all the ways to configure variables in tfpipboy's `var-config` section.
 
 ## Overview
 
@@ -113,7 +113,7 @@ modules:
         subscription_id: "9fd0d299-f872-47d2-b400-91d27060b5d1"
         tags:
           project: "landing-zone"
-          managed_by: "tf-pipboy"
+          managed_by: "tfpipboy"
 ```
 
 **Terraform command generated:**
@@ -122,7 +122,7 @@ terraform plan \
   -var=environment=production \
   -var=location=germanywestcentral \
   -var=subscription_id=9fd0d299-f872-47d2-b400-91d27060b5d1 \
-  -var=tags=map[managed_by:tf-pipboy project:landing-zone]
+  -var=tags=map[managed_by:tfpipboy project:landing-zone]
 ```
 
 ### Example 6: Mixed - Both `file` and `files`

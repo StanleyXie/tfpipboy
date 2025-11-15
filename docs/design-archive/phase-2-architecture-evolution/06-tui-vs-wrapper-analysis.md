@@ -121,7 +121,7 @@ When interactive input needed:
 ### Example TUI Display
 ```
 ╭─────────────────────────────────────────────────────────────╮
-│ tf-pipboy Orchestration: dev environment                    │
+│ tfpipboy Orchestration: dev environment                    │
 ├─────────────────────────────────────────────────────────────┤
 │                                                              │
 │  ✓  vpc     SUCCESS     2m 34s    [View Logs]              │

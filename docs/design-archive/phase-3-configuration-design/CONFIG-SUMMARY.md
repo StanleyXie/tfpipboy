@@ -4,7 +4,7 @@
 
 ## Quick Reference
 
-This document provides a quick overview of the declarative configuration format design for tf-pipboy.
+This document provides a quick overview of the declarative configuration format design for tfpipboy.
 
 ## The Three-Layer Model
 

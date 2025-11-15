@@ -1,7 +1,7 @@
 # Open Source Components Analysis
 
 **Date**: 2025-10-10  
-**Purpose**: Identify and evaluate open-source libraries for tf-pipboy implementation
+**Purpose**: Identify and evaluate open-source libraries for tfpipboy implementation
 
 ## Component Categories
 
@@ -185,7 +185,7 @@ struct Cli {
 - Tree structures
 - Automatic terminal capability detection
 
-**Key Features for tf-pipboy:**
+**Key Features for tfpipboy:**
 ```python
 from rich.console import Console
 from rich.live import Live
@@ -230,7 +230,7 @@ with Live(generate_table(), refresh_per_second=4) as live:
 - Mouse support
 - Widget library
 
-**Note**: More complex than needed for tf-pipboy. Consider only if building full TUI interface.
+**Note**: More complex than needed for tfpipboy. Consider only if building full TUI interface.
 
 ---
 
@@ -321,7 +321,7 @@ spinner.Success("Done!")
 - Multiple backends
 - Active development
 
-**Note**: Excellent but overkill for tf-pipboy. Only consider with Rust.
+**Note**: Excellent but overkill for tfpipboy. Only consider with Rust.
 
 ---
 
@@ -471,13 +471,13 @@ with open('backend.tf', 'r') as file:
 #### Phase 1 (Now): Shell Integration
 ```bash
 # Use Ghostty's shell integration for enhanced display
-# Configure custom prompt to show tf-pipboy context
-export PS1="[tf-pipboy: $TF_WORKSPACE] $PS1"
+# Configure custom prompt to show tfpipboy context
+export PS1="[tfpipboy: $TF_WORKSPACE] $PS1"
 ```
 
 #### Phase 2 (Future): libghostty Embedding
 - Wait for libghostty stable release
-- Embed terminal emulator in tf-pipboy
+- Embed terminal emulator in tfpipboy
 - Custom rendering for Terraform status
 - Advanced features (clickable resources, inline previews)
 

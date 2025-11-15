@@ -1,10 +1,10 @@
 # Guide: Adding New Authentication Providers
 
-This guide walks you through adding support for a new authentication provider to tf-pipboy.
+This guide walks you through adding support for a new authentication provider to tfpipboy.
 
 ## Overview
 
-The authentication system in tf-pipboy is designed to be extensible. Each provider implements the `Checker` interface and is registered with the `Manager` for concurrent execution.
+The authentication system in tfpipboy is designed to be extensible. Each provider implements the `Checker` interface and is registered with the `Manager` for concurrent execution.
 
 ## Architecture
 

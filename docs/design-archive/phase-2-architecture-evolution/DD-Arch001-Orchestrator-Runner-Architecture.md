@@ -6,7 +6,7 @@
 
 ## Executive Summary
 
-tf-pipboy is a **CI/CD Workflow Pipeline Orchestrator** for Terraform modules, designed to run in terminal environments. It uses a two-component architecture:
+tfpipboy is a **CI/CD Workflow Pipeline Orchestrator** for Terraform modules, designed to run in terminal environments. It uses a two-component architecture:
 - **Orchestrator**: TUI application for pipeline orchestration and monitoring
 - **Runner**: Dedicated terminal process for executing individual Terraform modules
 

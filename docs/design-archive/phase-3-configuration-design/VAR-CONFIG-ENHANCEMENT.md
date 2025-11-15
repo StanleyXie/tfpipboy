@@ -2,7 +2,7 @@
 
 ## Overview
 
-Enhanced the `var-config` section in tf-pipboy to support multiple variable files and improved variable handling, while maintaining backward compatibility with existing configurations.
+Enhanced the `var-config` section in tfpipboy to support multiple variable files and improved variable handling, while maintaining backward compatibility with existing configurations.
 
 ## Changes Made
 

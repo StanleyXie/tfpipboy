@@ -5,7 +5,7 @@
 
 ## Executive Summary
 
-This document provides a comprehensive development plan with user stories for implementing the **tf-pipboy Orchestrator-Runner architecture**. The plan is organized into 7 sprints over 14 weeks, focusing on delivering an MVP that enables declarative multi-module Terraform orchestration.
+This document provides a comprehensive development plan with user stories for implementing the **tfpipboy Orchestrator-Runner architecture**. The plan is organized into 7 sprints over 14 weeks, focusing on delivering an MVP that enables declarative multi-module Terraform orchestration.
 
 ---
 
@@ -934,7 +934,7 @@ Sprint 7: Polish (Weeks 13-14)
 ## Appendix: File Structure
 
 ```
-tf-pipboy/
+tfpipboy/
 ├── source/
 │   ├── orchestrator/
 │   │   ├── main.go

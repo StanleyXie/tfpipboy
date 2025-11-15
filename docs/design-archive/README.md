@@ -1,10 +1,10 @@
 # Design Archive
 
-This directory contains the complete history of tf-pipboy's design evolution, organized by development phases.
+This directory contains the complete history of tfpipboy's design evolution, organized by development phases.
 
 ## Purpose
 
-These documents represent the design thinking, decisions, and iterations that shaped tf-pipboy. While some decisions have been superseded, they provide valuable context for understanding the project's evolution and the rationale behind current architecture.
+These documents represent the design thinking, decisions, and iterations that shaped tfpipboy. While some decisions have been superseded, they provide valuable context for understanding the project's evolution and the rationale behind current architecture.
 
 ---
 
