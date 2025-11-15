@@ -8,6 +8,8 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"golang.org/x/term"
 )
 
 // Global mutex for stdout writes to prevent interleaving
@@ -39,6 +41,8 @@ type LiveBoard struct {
 	useColors   bool
 	firstRender bool          // Track if this is the first render
 	refreshDone chan struct{} // Signal when refresh loop has stopped
+	isTTY       bool          // Whether stdout is a terminal
+	lastRenderLines int       // Number of lines in last render (for TTY clearing)
 }
 
 // WorkflowStep represents a step in the execution workflow
@@ -72,15 +76,25 @@ type LiveJobStatus struct {
 
 // NewLiveBoard creates a new live board display
 func NewLiveBoard(useColors bool) *LiveBoard {
+	// Detect if stdout is a terminal
+	isTTY := term.IsTerminal(int(os.Stdout.Fd()))
+
+	// If not a TTY, use slower refresh rate to reduce output spam
+	refreshRate := 200 * time.Millisecond
+	if !isTTY {
+		refreshRate = 2 * time.Second // Much slower for non-TTY
+	}
+
 	return &LiveBoard{
 		jobs:        make(map[string]*LiveJobStatus),
 		jobOrder:    []string{},
 		stdout:      os.Stdout,
-		refreshRate: 200 * time.Millisecond,
+		refreshRate: refreshRate,
 		stopChan:    make(chan struct{}),
 		eventChan:   make(chan StatusUpdateEvent, 100), // Buffered channel for async events
 		refreshDone: make(chan struct{}),
 		useColors:   useColors,
+		isTTY:       isTTY,
 	}
 }
 
@@ -437,17 +451,39 @@ func (lb *LiveBoard) render() {
 	// Build the entire output in a buffer for atomic write
 	var buf strings.Builder
 
-	if lb.firstRender {
-		lb.firstRender = false
-		// First render - clear screen and move to top
-		fmt.Fprint(&buf, "\033[2J\033[H")
+	if lb.isTTY {
+		// TTY mode: use ANSI codes for in-place updates
+		if lb.firstRender {
+			lb.firstRender = false
+			// First render - clear screen and move to top
+			fmt.Fprint(&buf, "\033[2J\033[H")
+		} else {
+			// Subsequent renders - move cursor up to start of previous render
+			if lb.lastRenderLines > 0 {
+				fmt.Fprintf(&buf, "\033[%dA", lb.lastRenderLines)
+			}
+			// Move to beginning of line and clear from cursor to end of screen
+			fmt.Fprint(&buf, "\r\033[0J")
+		}
 	} else {
-		// Subsequent renders - move cursor to home position
-		fmt.Fprint(&buf, "\033[H")
-	}
+		// Non-TTY mode: only render on first and last (when all jobs done)
+		allDone := true
+		for _, job := range lb.jobs {
+			if job.Status != JobStatusCompleted && job.Status != JobStatusFailed {
+				allDone = false
+				break
+			}
+		}
 
-	// Clear from cursor to end of screen
-	fmt.Fprint(&buf, "\033[0J")
+		// Only render on first time or when all done
+		if !lb.firstRender && !allDone {
+			return
+		}
+
+		if lb.firstRender {
+			lb.firstRender = false
+		}
+	}
 
 	// Render header
 	elapsed := time.Since(lb.startTime).Round(time.Second)
@@ -508,6 +544,11 @@ func (lb *LiveBoard) render() {
 
 	// Render footer with statistics (aligned to match header width)
 	lb.renderFooterToBuffer(&buf)
+
+	// Count lines in the buffer for TTY cursor management
+	if lb.isTTY {
+		lb.lastRenderLines = strings.Count(buf.String(), "\n")
+	}
 
 	// Write the entire buffer atomically with mutex protection
 	stdoutMutex.Lock()
