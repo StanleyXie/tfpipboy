@@ -49,6 +49,66 @@ Before each release, we perform:
 - Review of Terraform state file access patterns
 - Validation of environment variable handling
 
+## Recent Security Audit (v0.6.1-pre)
+
+A comprehensive Gosec security audit was conducted in November 2024. The following issues were identified and addressed:
+
+### Fixed Issues
+
+**File and Directory Permissions (25 MEDIUM)**
+
+All file and directory creation operations were hardened to use restrictive permissions:
+
+- **File Permissions**: Changed from `0644` (rw-r--r--) to `0600` (rw-------)
+  - Prevents unauthorized users from reading sensitive Terraform files
+  - Affects: Debug logs, job metadata, plan outputs, state files, configuration files
+  - Modified files: `display.go`, `executor.go`, `workspace.go`, `terraform_output_filter.go`, `message_pipeline.go`, `logger.go`, `config.go`
+
+- **Directory Permissions**: Changed from `0755` (rwxr-xr-x) to `0750` (rwxr-x---)
+  - Prevents unauthorized users from listing workspace contents
+  - Affects: Workspace directories, log output directories
+  - Modified files: `workspace.go`, `message_pipeline.go`
+
+**Commit**: 3eba01f - "security: restrict file and directory permissions"
+
+### Accepted Risk Items
+
+The following Gosec findings are **by design** and represent intended functionality:
+
+**Subprocess Execution with Variables (4 MEDIUM)**
+
+tfpipboy's core purpose is to orchestrate Terraform CLI executions. Subprocess execution is essential:
+
+- **Purpose**: Execute `terraform init`, `terraform plan`, `terraform apply` commands
+- **Security Model**:
+  - Commands are constructed from validated configuration
+  - User provides modules and variables explicitly in config
+  - Runs in user context with user's Terraform authentication
+  - No privilege escalation occurs
+- **Mitigations**:
+  - Commands use Go's `exec.Command()` which properly handles argument separation
+  - Working directories are isolated per module
+  - Environment variables are inherited, not modified
+  - All execution is synchronous and monitored
+
+**File Inclusion via Variables (18 MEDIUM)**
+
+tfpipboy must read user-provided Terraform modules and configuration files:
+
+- **Purpose**: Load and validate Terraform modules, variables, and backend configurations
+- **Security Model**:
+  - User explicitly defines module paths in configuration
+  - All file access is within user-specified workspace
+  - No arbitrary file system traversal
+  - Read-only operations (never modifies source modules)
+- **Mitigations**:
+  - Workspace isolation prevents cross-contamination
+  - File paths are validated and normalized
+  - symlink resolution prevents directory traversal
+  - All operations are logged
+
+**Risk Assessment**: These operations are **intentional and required** for tfpipboy's orchestration functionality. The tool operates in the user's security context and cannot perform actions the user couldn't perform directly with Terraform CLI.
+
 ## Security Best Practices
 
 tfpipboy is designed with security in mind:
