@@ -15,14 +15,11 @@ linters-settings:
     min-complexity: 15
   goimports:
     local-prefixes: github.com/StanleyXie/tfpipboy
-  golint:
-    min-confidence: 0
   govet:
-    check-shadowing: true
+    enable:
+      - shadow
   lll:
     line-length: 140
-  maligned:
-    suggest-new: true
   misspell:
     locale: US
 
@@ -30,7 +27,6 @@ linters:
   disable-all: true
   enable:
     - bodyclose
-    - deadcode
     - errcheck
     - goconst
     - gocyclo
@@ -43,18 +39,17 @@ linters:
     - lll
     - misspell
     - staticcheck
-    - structcheck
     - typecheck
     - unconvert
     - unused
-    - varcheck
+    - shadow
 
 issues:
   exclude-use-default: false
+  exclude-dirs:
+    - vendor
   max-issues-per-linter: 0
   max-same-issues: 0
 
 run:
   timeout: 5m
-  skip-dirs:
-    - vendor
