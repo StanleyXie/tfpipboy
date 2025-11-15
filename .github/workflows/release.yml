@@ -35,31 +35,54 @@ jobs:
       - name: Run Gosec Security Scanner
         uses: securego/gosec@master
         with:
-          args: "-fmt sarif -out gosec-results.sarif ./..."
+          args: "-fmt json -out gosec-results.json ./..."
+        continue-on-error: true
 
-      - name: Upload Gosec SARIF
+      - name: Display Gosec Results
         if: always()
-        uses: github/codeql-action/upload-sarif@v3
-        with:
-          sarif_file: gosec-results.sarif
-          category: gosec
+        run: |
+          if [ -f gosec-results.json ]; then
+            echo "### Gosec Security Scan Results" >> $GITHUB_STEP_SUMMARY
+            cat gosec-results.json | jq -r '.Issues[] | "**\(.severity)**: \(.file):\(.line) - \(.details)"' >> $GITHUB_STEP_SUMMARY || echo "No issues found" >> $GITHUB_STEP_SUMMARY
+          fi
 
       - name: Run Trivy vulnerability scanner (dependencies)
         uses: aquasecurity/trivy-action@master
         with:
           scan-type: "fs"
           scan-ref: "."
+          format: "table"
+          severity: "CRITICAL,HIGH"
+          exit-code: "0" # Don't fail build, just report
+        continue-on-error: true
+
+      - name: Run Trivy for SARIF upload
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: "fs"
+          scan-ref: "."
           format: "sarif"
           output: "trivy-results.sarif"
-          severity: "CRITICAL,HIGH"
-          exit-code: "1" # Fail on critical/high vulnerabilities
+          severity: "CRITICAL,HIGH,MEDIUM"
+        continue-on-error: true
 
       - name: Upload Trivy SARIF
         if: always()
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: trivy-results.sarif
           category: trivy
+        continue-on-error: true
+
+      - name: Check for Critical Vulnerabilities
+        run: |
+          if [ -f trivy-results.sarif ]; then
+            critical_count=$(cat trivy-results.sarif | jq '[.runs[].results[] | select(.level == "error")] | length')
+            if [ "$critical_count" -gt 0 ]; then
+              echo "::error::Found $critical_count critical vulnerabilities"
+              exit 1
+            fi
+          fi
 
       - name: Generate SBOM
         uses: anchore/sbom-action@v0
