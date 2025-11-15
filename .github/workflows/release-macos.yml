@@ -1,0 +1,116 @@
+name: macOS Release
+
+on:
+  push:
+    tags:
+      - 'v*-macos'
+      - 'v*-test-fix*-macos'
+
+permissions:
+  contents: write
+
+jobs:
+  create-release:
+    name: Create macOS Release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Extract version from tag
+        id: get_version
+        run: |
+          echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+          echo "Tag: ${GITHUB_REF#refs/tags/}"
+
+      - name: Check for release artifacts
+        id: check_artifacts
+        run: |
+          VERSION="${{ steps.get_version.outputs.VERSION }}"
+          # Remove -macos suffix to get version number
+          VERSION_NUM=$(echo $VERSION | sed 's/-macos$//')
+          RELEASE_DIR="releases/${VERSION}"
+
+          echo "RELEASE_DIR=${RELEASE_DIR}" >> $GITHUB_OUTPUT
+          echo "VERSION_NUM=${VERSION_NUM}" >> $GITHUB_OUTPUT
+
+          if [ -d "${RELEASE_DIR}" ]; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+            echo "Found release directory: ${RELEASE_DIR}"
+            ls -lh "${RELEASE_DIR}"
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+            echo "Release directory not found: ${RELEASE_DIR}"
+          fi
+
+      - name: Prepare release notes
+        id: release_notes
+        run: |
+          VERSION="${{ steps.get_version.outputs.VERSION }}"
+          VERSION_NUM="${{ steps.check_artifacts.outputs.VERSION_NUM }}"
+          RELEASE_DIR="${{ steps.check_artifacts.outputs.RELEASE_DIR }}"
+
+          if [ -f "${RELEASE_DIR}/RELEASE_NOTES_${VERSION_NUM}.md" ]; then
+            echo "Using ${RELEASE_DIR}/RELEASE_NOTES_${VERSION_NUM}.md"
+            cp "${RELEASE_DIR}/RELEASE_NOTES_${VERSION_NUM}.md" /tmp/release_notes.md
+          elif [ -f "${RELEASE_DIR}/RELEASE_NOTES.md" ]; then
+            echo "Using ${RELEASE_DIR}/RELEASE_NOTES.md"
+            cp "${RELEASE_DIR}/RELEASE_NOTES.md" /tmp/release_notes.md
+          else
+            echo "Creating default release notes"
+            cat > /tmp/release_notes.md <<EOF
+          # macOS Test Release ${VERSION_NUM}
+
+          **Release Date:** $(date +%Y-%m-%d)
+          **Platforms:** macOS Intel (x86_64) + Apple Silicon (arm64)
+
+          ## Downloads
+
+          See release assets below for platform-specific binaries.
+
+          ## Installation
+
+          \`\`\`bash
+          # Download appropriate archive for your platform
+          # Intel Macs: *_x86_64.tar.gz
+          # Apple Silicon: *_arm64.tar.gz
+
+          tar xzf tfpipboy_*_Darwin_*.tar.gz
+          chmod +x tfpipboy
+          sudo mv tfpipboy /usr/local/bin/
+          tfpipboy --version
+          \`\`\`
+
+          ## Security Warning
+
+          This binary is not code-signed. On first run:
+          - Right-click → Open → Confirm, or
+          - Run: \`xattr -d com.apple.quarantine tfpipboy\`
+          EOF
+          fi
+
+          echo "notes_file=/tmp/release_notes.md" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ steps.get_version.outputs.VERSION }}
+          name: ${{ steps.get_version.outputs.VERSION_NUM }} - macOS Test Release
+          body_path: ${{ steps.release_notes.outputs.notes_file }}
+          draft: false
+          prerelease: true
+          files: |
+            ${{ steps.check_artifacts.outputs.RELEASE_DIR }}/*.tar.gz
+            ${{ steps.check_artifacts.outputs.RELEASE_DIR }}/checksums*.txt
+            ${{ steps.check_artifacts.outputs.RELEASE_DIR }}/BUILD_INFO_MACOS.md
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Release Summary
+        run: |
+          echo "::notice::macOS release created successfully"
+          echo "::notice::Tag: ${{ steps.get_version.outputs.VERSION }}"
+          echo "::notice::Release URL: https://github.com/${{ github.repository }}/releases/tag/${{ steps.get_version.outputs.VERSION }}"
