@@ -39,6 +39,7 @@ archives:
       - README.md
       - LICENSE
       - CHANGELOG.md
+      - sbom.spdx.json
 
 checksum:
   name_template: "checksums.txt"
@@ -106,7 +107,7 @@ brews:
     commit_author:
       name: goreleaserbot
       email: bot@goreleaser.com
-    folder: Formula
+
     install: |
       bin.install "tfpipboy"
     test: |
