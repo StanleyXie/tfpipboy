@@ -1,3 +1,5 @@
+version: 2
+
 linters-settings:
   dupl:
     threshold: 100
@@ -30,18 +32,19 @@ linters:
     - errcheck
     - goconst
     - gocyclo
-    - gofmt
-    - goimports
     - gosec
-    - gosimple
     - govet
     - ineffassign
     - lll
     - misspell
     - staticcheck
-    - typecheck
     - unconvert
     - unused
+
+formatters:
+  enable:
+    - gofmt
+    - goimports
 
 issues:
   exclude-use-default: false
