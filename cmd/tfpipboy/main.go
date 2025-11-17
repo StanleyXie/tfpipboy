@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/StanleyXie/tfpipboy/pkg/orchestrator"
+	"github.com/StanleyXie/tfpipboy/pkg/terraform"
 	"github.com/StanleyXie/tfpipboy/pkg/version"
 )
 
@@ -38,6 +39,8 @@ func main() {
 		olderThan       = flag.String("older-than", "", "Remove artifacts older than duration (e.g., 7d, 24h)")
 		shell           = flag.Bool("shell", false, "Open interactive shell in instance workspace")
 		execCmd         = flag.String("exec", "", "Execute command in instance workspace")
+		discover        = flag.String("discover", "", "Discover Terraform modules in specified path and generate configuration")
+		discoverOutput  = flag.String("discover-output", "", "Output file for discovered configuration (default: stdout)")
 		showHelp        = flag.Bool("help", false, "Show help message")
 		showVersion     = flag.Bool("version", false, "Show version")
 	)
@@ -51,6 +54,12 @@ func main() {
 
 	if *showHelp {
 		printHelp()
+		return
+	}
+
+	// Handle module discovery
+	if *discover != "" {
+		handleModuleDiscovery(*discover, *discoverOutput)
 		return
 	}
 
@@ -395,6 +404,8 @@ OPTIONS:
     --older-than DURATION  Remove artifacts older than duration (e.g., 7d, 24h)
     --shell                Open interactive shell in instance workspace (requires --targets)
     --exec COMMAND         Execute command in instance workspace (requires --targets)
+    --discover PATH        Discover Terraform modules in specified path
+    --discover-output FILE Write discovered configuration to file (default: stdout)
     --help                 Show this help message
     --version              Show version
 
@@ -434,6 +445,12 @@ EXAMPLES:
 
     # Execute single command in workspace
     tfpipboy --config .tfpipboy --targets core --exec "terraform plan"
+
+    # Discover Terraform modules in a directory
+    tfpipboy --discover ./terraform
+
+    # Discover modules and save configuration to file
+    tfpipboy --discover ./terraform --discover-output .tfpipboy/modules.yaml
 
     # Run manual Terraform commands
     tfpipboy --targets baseline.connectivity --exec "terraform state list"
@@ -970,4 +987,94 @@ func executeSingleCommand(workspacePath, modulePath, command string, env []strin
 		logger.Error("Command failed", "error", err)
 		os.Exit(1)
 	}
+}
+
+// handleModuleDiscovery discovers Terraform modules and generates configuration
+func handleModuleDiscovery(searchPath, outputFile string) {
+	fmt.Println("================================================================================")
+	fmt.Println("  TERRAFORM MODULE DISCOVERY")
+	fmt.Println("================================================================================")
+	fmt.Printf("Scanning path: %s\n", searchPath)
+	fmt.Println("================================================================================")
+	fmt.Println()
+
+	// Discover modules
+	result, err := terraform.DiscoverModules(searchPath)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "ERROR: Failed to discover modules: %v\n", err)
+		os.Exit(1)
+	}
+
+	// Print summary
+	fmt.Println("Discovery Summary:")
+	fmt.Printf("  Total modules found:     %d\n", result.Summary.TotalModules)
+	fmt.Printf("  Root modules:            %d\n", result.Summary.RootModules)
+	fmt.Printf("  Source modules:          %d\n", result.Summary.SourceModules)
+	fmt.Printf("  Tfvars files found:      %d\n", result.Summary.TfvarsFilesFound)
+	fmt.Println()
+
+	// Print discovered modules
+	if len(result.Modules) > 0 {
+		fmt.Println("Discovered Modules:")
+		for _, module := range result.Modules {
+			fmt.Printf("  [%s] %s\n", module.Type, module.RelativePath)
+			if len(module.Variables) > 0 {
+				fmt.Printf("      Variables: %d", len(module.Variables))
+				requiredCount := 0
+				for _, v := range module.Variables {
+					if v.Required {
+						requiredCount++
+					}
+				}
+				if requiredCount > 0 {
+					fmt.Printf(" (%d required)", requiredCount)
+				}
+				fmt.Println()
+			}
+			if len(module.Outputs) > 0 {
+				fmt.Printf("      Outputs: %d\n", len(module.Outputs))
+			}
+			if len(module.Dependencies) > 0 {
+				fmt.Printf("      Module dependencies: %d\n", len(module.Dependencies))
+			}
+		}
+		fmt.Println()
+	}
+
+	// Print tfvars files
+	if len(result.TfvarsFiles) > 0 {
+		fmt.Println("Discovered Tfvars Files:")
+		for _, tfvars := range result.TfvarsFiles {
+			fmt.Printf("  %s\n", tfvars.RelativePath)
+		}
+		fmt.Println()
+	}
+
+	// Generate YAML configuration
+	yamlConfig, err := result.GenerateYAMLConfig()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "ERROR: Failed to generate YAML configuration: %v\n", err)
+		os.Exit(1)
+	}
+
+	// Output configuration
+	if outputFile != "" {
+		if err := os.WriteFile(outputFile, []byte(yamlConfig), 0644); err != nil {
+			fmt.Fprintf(os.Stderr, "ERROR: Failed to write configuration to %s: %v\n", outputFile, err)
+			os.Exit(1)
+		}
+		fmt.Printf("Configuration written to: %s\n", outputFile)
+	} else {
+		fmt.Println("================================================================================")
+		fmt.Println("  GENERATED CONFIGURATION")
+		fmt.Println("================================================================================")
+		fmt.Println()
+		fmt.Println(yamlConfig)
+	}
+
+	fmt.Println("================================================================================")
+	fmt.Println("NOTE: The generated configuration template requires you to define instances")
+	fmt.Println("for each module before execution. Edit the configuration file and add")
+	fmt.Println("instance definitions under the 'instances' section of each module.")
+	fmt.Println("================================================================================")
 }
