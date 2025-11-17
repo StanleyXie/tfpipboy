@@ -1,3 +1,5 @@
+// Package orchestrator coordinates Terraform module execution with dependency
+// management, parallel execution, and real-time progress monitoring.
 package orchestrator
 
 import (

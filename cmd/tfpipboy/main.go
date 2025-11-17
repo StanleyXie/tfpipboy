@@ -1,3 +1,5 @@
+// Package main provides the tfpipboy CLI tool for orchestrating Terraform modules
+// with enhanced workspace context awareness and real-time authentication monitoring.
 package main
 
 import (
@@ -210,6 +212,11 @@ func main() {
 		// Execute pipeline
 		logger.Info("Executing pipeline", "pipeline", *pipeline, "environment", *environment)
 		result, err = orch.ExecutePipeline(*pipeline, *environment)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "ERROR: Execution failed: %v\n", err)
+			logger.Error("Execution failed", "error", err)
+			os.Exit(1)
+		}
 	} else if *targets != "" || *targetsAll {
 		// Determine target list
 		var targetList []string
@@ -310,7 +317,10 @@ func main() {
 			// Prompt for confirmation
 			fmt.Printf("\nDo you want to proceed with this execution plan? (yes/no): ")
 			var response string
-			fmt.Scanln(&response)
+			if _, err := fmt.Scanln(&response); err != nil {
+				fmt.Fprintf(os.Stderr, "Error reading input: %v\n", err)
+				os.Exit(1)
+			}
 			response = strings.ToLower(strings.TrimSpace(response))
 
 			if response != "yes" && response != "y" {
@@ -340,15 +350,14 @@ func main() {
 		}
 
 		result, err = orch.ExecutePlan(plan)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "ERROR: Execution failed: %v\n", err)
+			logger.Error("Execution failed", "error", err)
+			os.Exit(1)
+		}
 	} else {
 		logger.Error("Either --targets, --targets-all, or --pipeline must be specified")
 		printUsage()
-		os.Exit(1)
-	}
-
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "ERROR: Execution failed: %v\n", err)
-		logger.Error("Execution failed", "error", err)
 		os.Exit(1)
 	}
 
@@ -664,7 +673,10 @@ func handleCleanup(baseDir string, logger orchestrator.Logger, cleanupAll bool, 
 	if !cleanupAll && olderThan == "" {
 		fmt.Printf("\nProceed with cleanup? (y/N): ")
 		var response string
-		fmt.Scanln(&response)
+		if _, err := fmt.Scanln(&response); err != nil {
+			fmt.Fprintf(os.Stderr, "Error reading input: %v\n", err)
+			return
+		}
 		if strings.ToLower(strings.TrimSpace(response)) != "y" {
 			fmt.Printf("Cleanup cancelled.\n")
 			return
@@ -700,7 +712,7 @@ func handleCleanup(baseDir string, logger orchestrator.Logger, cleanupAll bool, 
 // getDirSize calculates the total size of a directory
 func getDirSize(path string) int64 {
 	var size int64
-	filepath.Walk(path, func(_ string, info os.FileInfo, err error) error {
+	_ = filepath.Walk(path, func(_ string, info os.FileInfo, err error) error {
 		if err != nil {
 			return nil
 		}

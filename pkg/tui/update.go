@@ -103,7 +103,7 @@ func runInteractiveCommand(command string, tfManager *terraform.Manager) tea.Cmd
 
 	// Use tea.ExecProcess to suspend TUI and give full terminal access
 	return tea.ExecProcess(cmd, func(err error) tea.Msg {
-		output := fmt.Sprintf("[Interactive command completed]")
+		output := "[Interactive command completed]"
 		if err != nil {
 			output = fmt.Sprintf("[Interactive command completed with error: %v]", err)
 		}
