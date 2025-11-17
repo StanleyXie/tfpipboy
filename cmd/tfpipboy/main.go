@@ -43,6 +43,7 @@ func main() {
 		execCmd         = flag.String("exec", "", "Execute command in instance workspace")
 		discover        = flag.String("discover", "", "Discover Terraform modules in specified path and generate configuration")
 		discoverOutput  = flag.String("discover-output", "", "Output file for discovered configuration (default: stdout)")
+		initWorkdir     = flag.Bool("init-workdir", false, "Initialize tfpipboy working directory with default structure")
 		showHelp        = flag.Bool("help", false, "Show help message")
 		showVersion     = flag.Bool("version", false, "Show version")
 	)
@@ -56,6 +57,12 @@ func main() {
 
 	if *showHelp {
 		printHelp()
+		return
+	}
+
+	// Handle workdir initialization
+	if *initWorkdir {
+		handleWorkdirInit(*configPath)
 		return
 	}
 
@@ -1001,6 +1008,102 @@ func executeSingleCommand(workspacePath, modulePath, command string, env []strin
 	}
 }
 
+// handleWorkdirInit initializes the tfpipboy working directory structure
+func handleWorkdirInit(configPath string) {
+	fmt.Println("================================================================================")
+	fmt.Println("  TFPIPBOY WORKDIR INITIALIZATION")
+	fmt.Println("================================================================================")
+	fmt.Printf("Initializing working directory: %s\n", configPath)
+	fmt.Println("================================================================================")
+	fmt.Println()
+
+	// Create main config directory
+	if err := os.MkdirAll(configPath, 0755); err != nil {
+		fmt.Fprintf(os.Stderr, "ERROR: Failed to create directory %s: %v\n", configPath, err)
+		os.Exit(1)
+	}
+	fmt.Printf("✓ Created directory: %s\n", configPath)
+
+	// Create example config.yaml if it doesn't exist
+	configFile := filepath.Join(configPath, "config.yaml")
+	if _, err := os.Stat(configFile); os.IsNotExist(err) {
+		exampleConfig := `# tfpipboy Configuration
+# Documentation: https://github.com/StanleyXie/tfpipboy
+
+# Modules define Terraform root modules to manage
+modules: []
+  # Example module configuration:
+  # - name: vpc
+  #   path: terraform/modules/vpc
+  #   enabled: true
+  #   tags:
+  #     - networking
+  #   instances:
+  #     dev:
+  #       workspace: dev
+  #       var_files:
+  #         - environments/dev.tfvars
+
+# Pipelines define ordered execution sequences
+pipelines: {}
+  # Example pipeline:
+  # deploy-infra:
+  #   environments:
+  #     dev:
+  #       stages:
+  #         - name: networking
+  #           modules: [vpc, subnets]
+  #         - name: compute
+  #           modules: [ec2]
+  #           depends_on: [networking]
+
+# Groups allow targeting multiple modules together
+groups: {}
+  # Example groups:
+  # networking: [vpc, subnets, security-groups]
+  # compute: [ec2, asg]
+`
+		if err := os.WriteFile(configFile, []byte(exampleConfig), 0644); err != nil {
+			fmt.Fprintf(os.Stderr, "ERROR: Failed to create %s: %v\n", configFile, err)
+			os.Exit(1)
+		}
+		fmt.Printf("✓ Created example configuration: %s\n", configFile)
+	} else {
+		fmt.Printf("⊗ Configuration already exists: %s\n", configFile)
+	}
+
+	// Create .gitignore if it doesn't exist
+	gitignoreFile := filepath.Join(configPath, ".gitignore")
+	if _, err := os.Stat(gitignoreFile); os.IsNotExist(err) {
+		gitignoreContent := `# tfpipboy artifacts
+*.log
+*.tfplan
+*.tfstate
+*.tfstate.backup
+workspaces/
+.terraform/
+`
+		if err := os.WriteFile(gitignoreFile, []byte(gitignoreContent), 0644); err != nil {
+			fmt.Fprintf(os.Stderr, "ERROR: Failed to create %s: %v\n", gitignoreFile, err)
+			os.Exit(1)
+		}
+		fmt.Printf("✓ Created .gitignore: %s\n", gitignoreFile)
+	} else {
+		fmt.Printf("⊗ .gitignore already exists: %s\n", gitignoreFile)
+	}
+
+	fmt.Println()
+	fmt.Println("================================================================================")
+	fmt.Println("  INITIALIZATION COMPLETE")
+	fmt.Println("================================================================================")
+	fmt.Println()
+	fmt.Println("Next steps:")
+	fmt.Printf("  1. Edit configuration: %s\n", configFile)
+	fmt.Println("  2. Discover modules: tfpipboy --discover <path> --discover-output .tfpipboy/discovered-modules.yaml")
+	fmt.Println("  3. Run tfpipboy: tfpipboy --targets-all --operation plan")
+	fmt.Println()
+}
+
 // handleModuleDiscovery discovers Terraform modules and generates configuration
 func handleModuleDiscovery(searchPath, outputFile string) {
 	fmt.Println("================================================================================")
@@ -1071,6 +1174,13 @@ func handleModuleDiscovery(searchPath, outputFile string) {
 
 	// Output configuration
 	if outputFile != "" {
+		// Create directory if it doesn't exist
+		dir := filepath.Dir(outputFile)
+		if err := os.MkdirAll(dir, 0755); err != nil {
+			fmt.Fprintf(os.Stderr, "ERROR: Failed to create directory %s: %v\n", dir, err)
+			os.Exit(1)
+		}
+
 		if err := os.WriteFile(outputFile, []byte(yamlConfig), 0644); err != nil {
 			fmt.Fprintf(os.Stderr, "ERROR: Failed to write configuration to %s: %v\n", outputFile, err)
 			os.Exit(1)
