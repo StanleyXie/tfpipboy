@@ -1,3 +1,5 @@
+// Package auth provides cloud provider authentication status checking
+// for AWS, Azure, GCP, and GitHub services.
 package auth
 
 import (

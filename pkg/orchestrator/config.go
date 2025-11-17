@@ -229,7 +229,7 @@ func (p *ConfigParser) processModule(name string, module *Module) error {
 	module.Name = name
 
 	// Set default enabled state
-	if module.Enabled == false && module.Path != "" {
+	if !module.Enabled && module.Path != "" {
 		module.Enabled = true
 	}
 
@@ -246,7 +246,7 @@ func (p *ConfigParser) processModule(name string, module *Module) error {
 	// Process instances
 	for instanceName, instance := range module.Instances {
 		instance.Name = instanceName
-		if instance.Enabled == false {
+		if !instance.Enabled {
 			instance.Enabled = true
 		}
 
