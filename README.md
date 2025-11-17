@@ -16,6 +16,7 @@ tfpipboy is a powerful Terraform orchestration tool that simplifies managing com
 
 - 🚀 **Parallel Execution** - Run independent modules concurrently
 - 🔗 **Dependency Management** - Automatic execution ordering
+- 🔍 **Module Discovery** - Automatically scan and generate configuration for Terraform modules
 - 🔐 **Authentication Monitoring** - Real-time status for AWS, Azure, GCP, GitHub
 - 📊 **Live Board** - Beautiful TUI with real-time job status
 - 🏗️ **Isolated Workspaces** - Each module runs in its own environment
@@ -129,6 +130,7 @@ See [ROADMAP.md](ROADMAP.md) for detailed project history and future plans.
 - **[Getting Started Guide](docs/getting-started.md)** - Quick start and basic concepts
 - **[User Guide](docs/user-guide.md)** - Complete usage documentation
 - **[Configuration Reference](docs/configuration.md)** - Detailed configuration options
+- **[Module Discovery Guide](docs/guides/module-discovery.md)** - Automatically discover and configure Terraform modules
 
 ### Project Information
 - **[ROADMAP](ROADMAP.md)** - Project evolution and future plans
@@ -224,6 +226,9 @@ instances:
 ## Example Commands
 
 ```bash
+# Discover modules and generate configuration
+tfpipboy --discover ./terraform --discover-output .tfpipboy/modules.yaml
+
 # Plan all modules
 tfpipboy --operation plan --targets-all
 
