@@ -3,7 +3,7 @@ package version
 
 // Version is the current version of tfpipboy
 // This should match the version in cmd/tfpipboy/main.go
-const Version = "0.6.3"
+const Version = "0.6.4"
 
 // Name is the application name
 const Name = "tfpipboy"
