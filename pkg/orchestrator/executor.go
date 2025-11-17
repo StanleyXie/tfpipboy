@@ -12,6 +12,8 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/StanleyXie/tfpipboy/pkg/state"
 )
 
 // TerraformExecutor handles execution of Terraform commands in isolated workspaces
@@ -28,11 +30,20 @@ type TerraformExecutor struct {
 	currentJobID        string                   // Current job ID for routing messages
 	jobPlanSummaries    map[string]string        // Per-job plan summaries (to avoid shared parser race)
 	mu                  sync.Mutex               // Mutex ONLY for jobPlanSummaries (local data structure)
+	stateManager        *state.Manager           // State tracking and drift detection
 }
 
 // NewTerraformExecutor creates a new Terraform executor
 func NewTerraformExecutor(workspaceManager WorkspaceManager, logger Logger) *TerraformExecutor {
 	display := NewProgressDisplay()
+
+	// Initialize state manager (use current directory's .tfpipboy for state tracking)
+	stateManager, err := state.NewManager(".tfpipboy")
+	if err != nil {
+		logger.Warn("Failed to initialize state manager, state tracking disabled", "error", err)
+		stateManager = nil
+	}
+
 	return &TerraformExecutor{
 		workspaceManager: workspaceManager,
 		logger:           logger,
@@ -41,6 +52,7 @@ func NewTerraformExecutor(workspaceManager WorkspaceManager, logger Logger) *Ter
 		progressDisplay:  display,
 		outputParser:     NewTerraformOutputParser(display),
 		jobPlanSummaries: make(map[string]string),
+		stateManager:     stateManager,
 	}
 }
 
@@ -433,6 +445,11 @@ func (e *TerraformExecutor) executeApply(ctx context.Context, job *ExecutionJob,
 		status = StatusFailed
 	}
 	e.progressDisplay.StopOperation(status, "")
+
+	// Track state changes after successful apply
+	if err == nil && e.stateManager != nil {
+		e.captureStateAfterApply(job, workspace, suppressOutput)
+	}
 
 	return err
 }
@@ -1032,6 +1049,92 @@ func (e *TerraformExecutor) getModuleAndInstance(job *ExecutionJob) (*Module, *I
 	// This would typically be provided by the orchestrator
 	// For now, return nil - the caller should provide this information
 	return nil, nil, fmt.Errorf("module configuration not available")
+}
+
+// captureStateAfterApply captures terraform state and tracks changes after successful apply
+func (e *TerraformExecutor) captureStateAfterApply(job *ExecutionJob, workspace *Workspace, suppressOutput bool) {
+	// Find tfstate file in workspace
+	tfstatePath := filepath.Join(workspace.Path, "terraform.tfstate")
+
+	// Check if state file exists (might be in remote backend)
+	if _, err := os.Stat(tfstatePath); os.IsNotExist(err) {
+		// Try to pull state from backend
+		e.logger.Debug("Local tfstate not found, attempting to pull from backend", "job_id", job.ID)
+		// For remote backends, we'd need to run 'terraform state pull'
+		// For now, skip state tracking if local state doesn't exist
+		if !suppressOutput {
+			e.logger.Info("State tracking skipped (remote backend)", "job_id", job.ID)
+		}
+		return
+	}
+
+	// Capture state snapshot and track changes
+	snapshot, changes, err := e.stateManager.CaptureState(job.ID, tfstatePath)
+	if err != nil {
+		e.logger.Warn("Failed to capture state snapshot", "job_id", job.ID, "error", err)
+		return
+	}
+
+	if !suppressOutput {
+		e.logger.Info("State snapshot captured",
+			"job_id", job.ID,
+			"version", snapshot.Version,
+			"resources", len(snapshot.Resources),
+			"changes", len(changes))
+
+		// Log changes
+		if len(changes) > 0 {
+			e.logger.Info("State changes detected:", "job_id", job.ID)
+			for _, change := range changes {
+				e.logger.Info("  ",
+					"operation", change.Operation,
+					"resource", change.ResourceAddress,
+					"attributes_changed", len(change.AttributeChanges))
+			}
+		}
+	}
+
+	// Send state tracking event
+	e.sendEvent(StatusUpdateEvent{
+		JobID:     job.ID,
+		EventType: "state_captured",
+		Progress:  fmt.Sprintf("State v%d captured (%d resources, %d changes)", snapshot.Version, len(snapshot.Resources), len(changes)),
+	})
+}
+
+// detectDriftBeforePlan detects drift and includes it in plan output
+func (e *TerraformExecutor) detectDriftBeforePlan(job *ExecutionJob, workspace *Workspace, planOutput string) {
+	if e.stateManager == nil {
+		return
+	}
+
+	// Detect drift from plan output
+	report, err := e.stateManager.DetectDrift(job.ID, planOutput)
+	if err != nil {
+		e.logger.Warn("Failed to detect drift", "job_id", job.ID, "error", err)
+		return
+	}
+
+	if report.HasDrift {
+		e.logger.Warn("Drift detected!",
+			"job_id", job.ID,
+			"drifted_resources", report.Summary.DriftedResources,
+			"updated", report.Summary.UpdatedResources,
+			"deleted", report.Summary.DeletedResources)
+
+		// Log drift details
+		issues := state.ValidateDriftReport(report)
+		for _, issue := range issues {
+			e.logger.Warn(issue, "job_id", job.ID)
+		}
+
+		// Send drift detection event
+		e.sendEvent(StatusUpdateEvent{
+			JobID:     job.ID,
+			EventType: "drift_detected",
+			Progress:  fmt.Sprintf("Drift: %d resources changed", report.Summary.DriftedResources),
+		})
+	}
 }
 
 // failJob marks a job as failed and logs the error
