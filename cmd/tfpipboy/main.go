@@ -1013,6 +1013,12 @@ func handleModuleDiscovery(searchPath, outputFile string) {
 	fmt.Printf("  Tfvars files found:      %d\n", result.Summary.TfvarsFilesFound)
 	fmt.Println()
 
+	// Print tree structure
+	if result.TreeStructure != nil {
+		fmt.Println(result.RenderTree())
+		fmt.Println()
+	}
+
 	// Print discovered modules
 	if len(result.Modules) > 0 {
 		fmt.Println("Discovered Modules:")

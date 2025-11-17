@@ -253,8 +253,8 @@ func TestGenerateYAMLConfig(t *testing.T) {
 		t.Error("Expected YAML to contain test-module")
 	}
 
-	if !strings.Contains(yamlConfig, "_tfvars_reference") {
-		t.Error("Expected YAML to contain tfvars reference")
+	if !strings.Contains(yamlConfig, "_tfvars_files") {
+		t.Error("Expected YAML to contain tfvars files")
 	}
 }
 
