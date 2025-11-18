@@ -39,9 +39,15 @@ linters:
     - lll
     - misspell
     - staticcheck
+    - unconvert
     - unused
     - gocritic
     - revive
+
+formatters:
+  enable:
+    - gofmt
+    - goimports
 
 issues:
   exclude-use-default: false

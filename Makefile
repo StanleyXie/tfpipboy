@@ -28,15 +28,42 @@ run: ## Run the application
 	@echo "Running $(BINARY_NAME)..."
 	$(GOCMD) run ./cmd/tfpipboy/main.go
 
-test: ## Run tests
-	@echo "Running tests..."
+test: ## Run all tests (unit + race + lint + security)
+	@$(MAKE) test-unit
+	@$(MAKE) test-race
+	@$(MAKE) lint
+	@$(MAKE) test-security
+
+test-unit: ## Run unit tests
+	@echo "Running unit tests..."
 	$(GOTEST) -v ./...
+
+test-race: ## Run tests with race detector
+	@echo "Running tests with race detector..."
+	$(GOTEST) -v -race ./...
 
 test-coverage: ## Run tests with coverage
 	@echo "Running tests with coverage..."
-	$(GOTEST) -v -coverprofile=coverage.out ./...
+	$(GOTEST) -v -coverprofile=coverage.out -covermode=atomic ./...
 	$(GOCMD) tool cover -html=coverage.out -o coverage.html
+	$(GOCMD) tool cover -func=coverage.out
 	@echo "Coverage report generated: coverage.html"
+
+test-security: ## Run security scans (gosec)
+	@echo "Running security scans..."
+	@if command -v gosec >/dev/null 2>&1; then \
+		gosec -fmt=json -out=gosec-report.json ./...; \
+		gosec ./...; \
+	else \
+		echo "gosec not installed. Installing..."; \
+		go install github.com/securego/gosec/v2/cmd/gosec@latest; \
+		gosec -fmt=json -out=gosec-report.json ./...; \
+		gosec ./...; \
+	fi
+
+test-bench: ## Run benchmark tests
+	@echo "Running benchmark tests..."
+	$(GOTEST) -bench=. -benchmem ./...
 
 clean: ## Clean build artifacts
 	@echo "Cleaning..."
@@ -49,12 +76,24 @@ install: build ## Install the binary to $GOPATH/bin
 	@cp $(BINARY_PATH) $(GOPATH)/bin/$(BINARY_NAME)
 	@echo "Installed to $(GOPATH)/bin/$(BINARY_NAME)"
 
-lint: ## Run linter
+lint: ## Run linter (strict mode - fails on errors)
 	@echo "Running linter..."
 	@if command -v golangci-lint >/dev/null 2>&1; then \
-		golangci-lint run ./...; \
+		golangci-lint run --timeout=5m ./...; \
 	else \
-		echo "golangci-lint not installed. Install with: brew install golangci-lint"; \
+		echo "golangci-lint not installed. Installing..."; \
+		go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest; \
+		golangci-lint run --timeout=5m ./...; \
+	fi
+
+lint-fix: ## Run linter and auto-fix issues
+	@echo "Running linter with auto-fix..."
+	@if command -v golangci-lint >/dev/null 2>&1; then \
+		golangci-lint run --fix --timeout=5m ./...; \
+	else \
+		echo "golangci-lint not installed. Installing..."; \
+		go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest; \
+		golangci-lint run --fix --timeout=5m ./...; \
 	fi
 
 fmt: ## Format code

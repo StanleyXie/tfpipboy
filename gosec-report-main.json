@@ -1,0 +1,716 @@
+{
+	"Golang errors": {},
+	"Issues": [
+		{
+			"severity": "MEDIUM",
+			"confidence": "HIGH",
+			"cwe": {
+				"id": "78",
+				"url": "https://cwe.mitre.org/data/definitions/78.html"
+			},
+			"rule_id": "G204",
+			"details": "Subprocess launched with variable",
+			"file": "/home/user/tfpipboy/pkg/tui/update.go",
+			"code": "212: \n213: \tcmd := exec.Command(shell, \"-c\", command)\n214: \tcmd.Dir, _ = os.Getwd()\n",
+			"line": "213",
+			"column": "9",
+			"nosec": false,
+			"suppressions": null
+		},
+		{
+			"severity": "MEDIUM",
+			"confidence": "HIGH",
+			"cwe": {
+				"id": "78",
+				"url": "https://cwe.mitre.org/data/definitions/78.html"
+			},
+			"rule_id": "G204",
+			"details": "Subprocess launched with variable",
+			"file": "/home/user/tfpipboy/pkg/tui/update.go",
+			"code": "99: \n100: \tcmd := exec.Command(shell, \"-c\", command)\n101: \tcmd.Dir, _ = os.Getwd()\n",
+			"line": "100",
+			"column": "9",
+			"nosec": false,
+			"suppressions": null
+		},
+		{
+			"severity": "MEDIUM",
+			"confidence": "HIGH",
+			"cwe": {
+				"id": "78",
+				"url": "https://cwe.mitre.org/data/definitions/78.html"
+			},
+			"rule_id": "G204",
+			"details": "Subprocess launched with variable",
+			"file": "/home/user/tfpipboy/pkg/cli/wrapper.go",
+			"code": "427: \n428: \tcmd := exec.CommandContext(ctx, shell, \"-c\", command)\n429: \tcwd, err := os.Getwd()\n",
+			"line": "428",
+			"column": "9",
+			"nosec": false,
+			"suppressions": null
+		},
+		{
+			"severity": "MEDIUM",
+			"confidence": "HIGH",
+			"cwe": {
+				"id": "78",
+				"url": "https://cwe.mitre.org/data/definitions/78.html"
+			},
+			"rule_id": "G204",
+			"details": "Subprocess launched with variable",
+			"file": "/home/user/tfpipboy/cmd/tfpipboy/main.go",
+			"code": "971: \n972: \tcmd := exec.Command(shell)\n973: \tcmd.Dir = modulePath // Use module path as working directory\n",
+			"line": "972",
+			"column": "9",
+			"nosec": false,
+			"suppressions": null
+		},
+		{
+			"severity": "MEDIUM",
+			"confidence": "HIGH",
+			"cwe": {
+				"id": "22",
+				"url": "https://cwe.mitre.org/data/definitions/22.html"
+			},
+			"rule_id": "G304",
+			"details": "Potential file inclusion via variable",
+			"file": "/home/user/tfpipboy/pkg/terraform/workspace.go",
+			"code": "39: \n40: \tdata, err := os.ReadFile(envFile)\n41: \tif err != nil {\n",
+			"line": "40",
+			"column": "15",
+			"nosec": false,
+			"suppressions": null
+		},
+		{
+			"severity": "MEDIUM",
+			"confidence": "HIGH",
+			"cwe": {
+				"id": "22",
+				"url": "https://cwe.mitre.org/data/definitions/22.html"
+			},
+			"rule_id": "G304",
+			"details": "Potential file inclusion via variable",
+			"file": "/home/user/tfpipboy/pkg/terraform/module.go",
+			"code": "172: \tfor _, file := range files {\n173: \t\tdata, err := os.ReadFile(file)\n174: \t\tif err != nil {\n",
+			"line": "173",
+			"column": "16",
+			"nosec": false,
+			"suppressions": null
+		},
+		{
+			"severity": "MEDIUM",
+			"confidence": "HIGH",
+			"cwe": {
+				"id": "22",
+				"url": "https://cwe.mitre.org/data/definitions/22.html"
+			},
+			"rule_id": "G304",
+			"details": "Potential file inclusion via variable",
+			"file": "/home/user/tfpipboy/pkg/terraform/module.go",
+			"code": "51: \n52: \tdata, err := os.ReadFile(manifestFile)\n53: \tif err != nil {\n",
+			"line": "52",
+			"column": "15",
+			"nosec": false,
+			"suppressions": null
+		},
+		{
+			"severity": "MEDIUM",
+			"confidence": "HIGH",
+			"cwe": {
+				"id": "22",
+				"url": "https://cwe.mitre.org/data/definitions/22.html"
+			},
+			"rule_id": "G304",
+			"details": "Potential file inclusion via variable",
+			"file": "/home/user/tfpipboy/pkg/terraform/discovery.go",
+			"code": "193: \tfor _, tfFile := range tfFiles {\n194: \t\tcontent, err := os.ReadFile(tfFile)\n195: \t\tif err != nil {\n",
+			"line": "194",
+			"column": "19",
+			"nosec": false,
+			"suppressions": null
+		},
+		{
+			"severity": "MEDIUM",
+			"confidence": "HIGH",
+			"cwe": {
+				"id": "22",
+				"url": "https://cwe.mitre.org/data/definitions/22.html"
+			},
+			"rule_id": "G304",
+			"details": "Potential file inclusion via variable",
+			"file": "/home/user/tfpipboy/pkg/terraform/backend.go",
+			"code": "77: \tfor _, file := range files {\n78: \t\tdata, err := os.ReadFile(file)\n79: \t\tif err != nil {\n",
+			"line": "78",
+			"column": "16",
+			"nosec": false,
+			"suppressions": null
+		},
+		{
+			"severity": "MEDIUM",
+			"confidence": "HIGH",
+			"cwe": {
+				"id": "22",
+				"url": "https://cwe.mitre.org/data/definitions/22.html"
+			},
+			"rule_id": "G304",
+			"details": "Potential file inclusion via variable",
+			"file": "/home/user/tfpipboy/pkg/terraform/backend.go",
+			"code": "38: \n39: \tdata, err := os.ReadFile(stateFile)\n40: \tif err != nil {\n",
+			"line": "39",
+			"column": "15",
+			"nosec": false,
+			"suppressions": null
+		},
+		{
+			"severity": "MEDIUM",
+			"confidence": "HIGH",
+			"cwe": {
+				"id": "22",
+				"url": "https://cwe.mitre.org/data/definitions/22.html"
+			},
+			"rule_id": "G304",
+			"details": "Potential file inclusion via variable",
+			"file": "/home/user/tfpipboy/pkg/orchestrator/workspace.go",
+			"code": "386: \t// Read source file\n387: \tdata, err := os.ReadFile(srcFile)\n388: \tif err != nil {\n",
+			"line": "387",
+			"column": "15",
+			"nosec": false,
+			"suppressions": null
+		},
+		{
+			"severity": "MEDIUM",
+			"confidence": "HIGH",
+			"cwe": {
+				"id": "22",
+				"url": "https://cwe.mitre.org/data/definitions/22.html"
+			},
+			"rule_id": "G304",
+			"details": "Potential file inclusion via variable",
+			"file": "/home/user/tfpipboy/pkg/orchestrator/workspace.go",
+			"code": "283: \t// Read source file\n284: \tdata, err := os.ReadFile(srcFile)\n285: \tif err != nil {\n",
+			"line": "284",
+			"column": "15",
+			"nosec": false,
+			"suppressions": null
+		},
+		{
+			"severity": "MEDIUM",
+			"confidence": "HIGH",
+			"cwe": {
+				"id": "22",
+				"url": "https://cwe.mitre.org/data/definitions/22.html"
+			},
+			"rule_id": "G304",
+			"details": "Potential file inclusion via variable",
+			"file": "/home/user/tfpipboy/pkg/orchestrator/workspace.go",
+			"code": "185: \t// Read the file\n186: \tcontent, err := os.ReadFile(filePath)\n187: \tif err != nil {\n",
+			"line": "186",
+			"column": "18",
+			"nosec": false,
+			"suppressions": null
+		},
+		{
+			"severity": "MEDIUM",
+			"confidence": "HIGH",
+			"cwe": {
+				"id": "22",
+				"url": "https://cwe.mitre.org/data/definitions/22.html"
+			},
+			"rule_id": "G304",
+			"details": "Potential file inclusion via variable",
+			"file": "/home/user/tfpipboy/pkg/orchestrator/orchestrator.go",
+			"code": "706: \t\t// Read file and detect\n707: \t\tcontent, err := os.ReadFile(filePath)\n708: \t\tif err == nil {\n",
+			"line": "707",
+			"column": "19",
+			"nosec": false,
+			"suppressions": null
+		},
+		{
+			"severity": "MEDIUM",
+			"confidence": "HIGH",
+			"cwe": {
+				"id": "22",
+				"url": "https://cwe.mitre.org/data/definitions/22.html"
+			},
+			"rule_id": "G304",
+			"details": "Potential file inclusion via variable",
+			"file": "/home/user/tfpipboy/pkg/orchestrator/message_router.go",
+			"code": "335: \t\t\t\tplanFilePath := filepath.Join(mr.config.BaseLogDir, \"..\", \"workspaces\", instanceID, \"terraform.tfplan.txt\")\n336: \t\t\t\tif planFileData, err := os.ReadFile(planFilePath); err == nil {\n337: \t\t\t\t\t// Process plan file line by line to extract resource changes\n",
+			"line": "336",
+			"column": "29",
+			"nosec": false,
+			"suppressions": null
+		},
+		{
+			"severity": "MEDIUM",
+			"confidence": "HIGH",
+			"cwe": {
+				"id": "22",
+				"url": "https://cwe.mitre.org/data/definitions/22.html"
+			},
+			"rule_id": "G304",
+			"details": "Potential file inclusion via variable",
+			"file": "/home/user/tfpipboy/pkg/orchestrator/message_pipeline.go",
+			"code": "213: \t// Open file for appending\n214: \tfile, err := os.OpenFile(filePath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0600)\n215: \tif err != nil {\n",
+			"line": "214",
+			"column": "15",
+			"nosec": false,
+			"suppressions": null
+		},
+		{
+			"severity": "MEDIUM",
+			"confidence": "HIGH",
+			"cwe": {
+				"id": "22",
+				"url": "https://cwe.mitre.org/data/definitions/22.html"
+			},
+			"rule_id": "G304",
+			"details": "Potential file inclusion via variable",
+			"file": "/home/user/tfpipboy/pkg/orchestrator/logger.go",
+			"code": "54: func NewFileLogger(level LogLevel, filename string) (*DefaultLogger, error) {\n55: \tfile, err := os.OpenFile(filename, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0600)\n56: \tif err != nil {\n",
+			"line": "55",
+			"column": "15",
+			"nosec": false,
+			"suppressions": null
+		},
+		{
+			"severity": "MEDIUM",
+			"confidence": "HIGH",
+			"cwe": {
+				"id": "22",
+				"url": "https://cwe.mitre.org/data/definitions/22.html"
+			},
+			"rule_id": "G304",
+			"details": "Potential file inclusion via variable",
+			"file": "/home/user/tfpipboy/pkg/orchestrator/executor.go",
+			"code": "1405: \tversionFile := filepath.Join(workspacePath, \".terraform\", \"terraform.tfstate\")\n1406: \tif data, err := os.ReadFile(versionFile); err == nil {\n1407: \t\tvar state map[string]interface{}\n",
+			"line": "1406",
+			"column": "18",
+			"nosec": false,
+			"suppressions": null
+		},
+		{
+			"severity": "MEDIUM",
+			"confidence": "HIGH",
+			"cwe": {
+				"id": "22",
+				"url": "https://cwe.mitre.org/data/definitions/22.html"
+			},
+			"rule_id": "G304",
+			"details": "Potential file inclusion via variable",
+			"file": "/home/user/tfpipboy/pkg/orchestrator/executor.go",
+			"code": "856: \t\terrorLogPath := filepath.Join(workspace.LogDir, fmt.Sprintf(\"%s-error.log\", job.ID))\n857: \t\tif errorFile, errCreate := os.Create(errorLogPath); errCreate == nil {\n858: \t\t\tdefer func() {\n",
+			"line": "857",
+			"column": "30",
+			"nosec": false,
+			"suppressions": null
+		},
+		{
+			"severity": "MEDIUM",
+			"confidence": "HIGH",
+			"cwe": {
+				"id": "22",
+				"url": "https://cwe.mitre.org/data/definitions/22.html"
+			},
+			"rule_id": "G304",
+			"details": "Potential file inclusion via variable",
+			"file": "/home/user/tfpipboy/pkg/orchestrator/executor.go",
+			"code": "609: \tlogFilePath := filepath.Join(workspace.LogDir, fmt.Sprintf(\"%s.log\", job.ID))\n610: \tlogFile, err := os.Create(logFilePath)\n611: \tif err != nil {\n",
+			"line": "610",
+			"column": "18",
+			"nosec": false,
+			"suppressions": null
+		},
+		{
+			"severity": "MEDIUM",
+			"confidence": "HIGH",
+			"cwe": {
+				"id": "22",
+				"url": "https://cwe.mitre.org/data/definitions/22.html"
+			},
+			"rule_id": "G304",
+			"details": "Potential file inclusion via variable",
+			"file": "/home/user/tfpipboy/pkg/orchestrator/display.go",
+			"code": "705: \tif planTextFile != \"\" {\n706: \t\tif content, err := os.ReadFile(planTextFile); err == nil {\n707: \t\t\tlines := strings.Split(string(content), \"\\n\")\n",
+			"line": "706",
+			"column": "22",
+			"nosec": false,
+			"suppressions": null
+		},
+		{
+			"severity": "MEDIUM",
+			"confidence": "HIGH",
+			"cwe": {
+				"id": "22",
+				"url": "https://cwe.mitre.org/data/definitions/22.html"
+			},
+			"rule_id": "G304",
+			"details": "Potential file inclusion via variable",
+			"file": "/home/user/tfpipboy/pkg/orchestrator/config.go",
+			"code": "160: func (p *ConfigParser) loadConfigFile(filename string, config *Config) error {\n161: \tdata, err := os.ReadFile(filename)\n162: \tif err != nil {\n",
+			"line": "161",
+			"column": "15",
+			"nosec": false,
+			"suppressions": null
+		},
+		{
+			"severity": "MEDIUM",
+			"confidence": "HIGH",
+			"cwe": {
+				"id": "22",
+				"url": "https://cwe.mitre.org/data/definitions/22.html"
+			},
+			"rule_id": "G304",
+			"details": "Potential file inclusion via variable",
+			"file": "/home/user/tfpipboy/pkg/cli/wrapper.go",
+			"code": "135: \t\ttmpFile := w.historyFile + \".tmp\"\n136: \t\tf, err := os.OpenFile(tmpFile, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, historyFileMode)\n137: \t\tif err != nil {\n",
+			"line": "136",
+			"column": "13",
+			"nosec": false,
+			"suppressions": null
+		},
+		{
+			"severity": "MEDIUM",
+			"confidence": "HIGH",
+			"cwe": {
+				"id": "276",
+				"url": "https://cwe.mitre.org/data/definitions/276.html"
+			},
+			"rule_id": "G301",
+			"details": "Expect directory permissions to be 0750 or less",
+			"file": "/home/user/tfpipboy/cmd/tfpipboy/main.go",
+			"code": "1178: \t\tdir := filepath.Dir(outputFile)\n1179: \t\tif err := os.MkdirAll(dir, 0755); err != nil {\n1180: \t\t\tfmt.Fprintf(os.Stderr, \"ERROR: Failed to create directory %s: %v\\n\", dir, err)\n",
+			"line": "1179",
+			"column": "13",
+			"nosec": false,
+			"suppressions": null
+		},
+		{
+			"severity": "MEDIUM",
+			"confidence": "HIGH",
+			"cwe": {
+				"id": "276",
+				"url": "https://cwe.mitre.org/data/definitions/276.html"
+			},
+			"rule_id": "G301",
+			"details": "Expect directory permissions to be 0750 or less",
+			"file": "/home/user/tfpipboy/cmd/tfpipboy/main.go",
+			"code": "1020: \t// Create main config directory\n1021: \tif err := os.MkdirAll(configPath, 0755); err != nil {\n1022: \t\tfmt.Fprintf(os.Stderr, \"ERROR: Failed to create directory %s: %v\\n\", configPath, err)\n",
+			"line": "1021",
+			"column": "12",
+			"nosec": false,
+			"suppressions": null
+		},
+		{
+			"severity": "MEDIUM",
+			"confidence": "HIGH",
+			"cwe": {
+				"id": "276",
+				"url": "https://cwe.mitre.org/data/definitions/276.html"
+			},
+			"rule_id": "G306",
+			"details": "Expect WriteFile permissions to be 0600 or less",
+			"file": "/home/user/tfpipboy/cmd/tfpipboy/main.go",
+			"code": "1183: \n1184: \t\tif err := os.WriteFile(outputFile, []byte(yamlConfig), 0644); err != nil {\n1185: \t\t\tfmt.Fprintf(os.Stderr, \"ERROR: Failed to write configuration to %s: %v\\n\", outputFile, err)\n",
+			"line": "1184",
+			"column": "13",
+			"nosec": false,
+			"suppressions": null
+		},
+		{
+			"severity": "MEDIUM",
+			"confidence": "HIGH",
+			"cwe": {
+				"id": "276",
+				"url": "https://cwe.mitre.org/data/definitions/276.html"
+			},
+			"rule_id": "G306",
+			"details": "Expect WriteFile permissions to be 0600 or less",
+			"file": "/home/user/tfpipboy/cmd/tfpipboy/main.go",
+			"code": "1085: `\n1086: \t\tif err := os.WriteFile(gitignoreFile, []byte(gitignoreContent), 0644); err != nil {\n1087: \t\t\tfmt.Fprintf(os.Stderr, \"ERROR: Failed to create %s: %v\\n\", gitignoreFile, err)\n",
+			"line": "1086",
+			"column": "13",
+			"nosec": false,
+			"suppressions": null
+		},
+		{
+			"severity": "MEDIUM",
+			"confidence": "HIGH",
+			"cwe": {
+				"id": "276",
+				"url": "https://cwe.mitre.org/data/definitions/276.html"
+			},
+			"rule_id": "G306",
+			"details": "Expect WriteFile permissions to be 0600 or less",
+			"file": "/home/user/tfpipboy/cmd/tfpipboy/main.go",
+			"code": "1065: `\n1066: \t\tif err := os.WriteFile(configFile, []byte(exampleConfig), 0644); err != nil {\n1067: \t\t\tfmt.Fprintf(os.Stderr, \"ERROR: Failed to create %s: %v\\n\", configFile, err)\n",
+			"line": "1066",
+			"column": "13",
+			"nosec": false,
+			"suppressions": null
+		},
+		{
+			"severity": "LOW",
+			"confidence": "HIGH",
+			"cwe": {
+				"id": "242",
+				"url": "https://cwe.mitre.org/data/definitions/242.html"
+			},
+			"rule_id": "G103",
+			"details": "Use of unsafe calls should be audited",
+			"file": "/home/user/tfpipboy/pkg/cli/wrapper_unix.go",
+			"code": "23: \t\tuintptr(syscall.TIOCGWINSZ),\n24: \t\tuintptr(unsafe.Pointer(ws)))\n25: \n",
+			"line": "24",
+			"column": "11",
+			"nosec": false,
+			"suppressions": null
+		},
+		{
+			"severity": "LOW",
+			"confidence": "HIGH",
+			"cwe": {
+				"id": "703",
+				"url": "https://cwe.mitre.org/data/definitions/703.html"
+			},
+			"rule_id": "G104",
+			"details": "Errors unhandled",
+			"file": "/home/user/tfpipboy/pkg/orchestrator/workspace.go",
+			"code": "81: \tif err := wm.setupModuleFiles(workspace, module); err != nil {\n82: \t\twm.CleanupWorkspace(workspace)\n83: \t\treturn nil, fmt.Errorf(\"failed to setup module files: %w\", err)\n",
+			"line": "82",
+			"column": "3",
+			"nosec": false,
+			"suppressions": null
+		},
+		{
+			"severity": "LOW",
+			"confidence": "HIGH",
+			"cwe": {
+				"id": "703",
+				"url": "https://cwe.mitre.org/data/definitions/703.html"
+			},
+			"rule_id": "G104",
+			"details": "Errors unhandled",
+			"file": "/home/user/tfpipboy/pkg/orchestrator/workspace.go",
+			"code": "75: \tif err := wm.setupEnvironment(workspace, module, instance); err != nil {\n76: \t\twm.CleanupWorkspace(workspace)\n77: \t\treturn nil, fmt.Errorf(\"failed to setup environment: %w\", err)\n",
+			"line": "76",
+			"column": "3",
+			"nosec": false,
+			"suppressions": null
+		},
+		{
+			"severity": "LOW",
+			"confidence": "HIGH",
+			"cwe": {
+				"id": "703",
+				"url": "https://cwe.mitre.org/data/definitions/703.html"
+			},
+			"rule_id": "G104",
+			"details": "Errors unhandled",
+			"file": "/home/user/tfpipboy/pkg/orchestrator/workspace.go",
+			"code": "69: \tif err := wm.setupVariables(workspace, module, instance); err != nil {\n70: \t\twm.CleanupWorkspace(workspace)\n71: \t\treturn nil, fmt.Errorf(\"failed to setup variables: %w\", err)\n",
+			"line": "70",
+			"column": "3",
+			"nosec": false,
+			"suppressions": null
+		},
+		{
+			"severity": "LOW",
+			"confidence": "HIGH",
+			"cwe": {
+				"id": "703",
+				"url": "https://cwe.mitre.org/data/definitions/703.html"
+			},
+			"rule_id": "G104",
+			"details": "Errors unhandled",
+			"file": "/home/user/tfpipboy/pkg/orchestrator/workspace.go",
+			"code": "63: \tif err := wm.setupBackend(workspace, module, instance); err != nil {\n64: \t\twm.CleanupWorkspace(workspace)\n65: \t\treturn nil, fmt.Errorf(\"failed to setup backend: %w\", err)\n",
+			"line": "64",
+			"column": "3",
+			"nosec": false,
+			"suppressions": null
+		},
+		{
+			"severity": "LOW",
+			"confidence": "HIGH",
+			"cwe": {
+				"id": "703",
+				"url": "https://cwe.mitre.org/data/definitions/703.html"
+			},
+			"rule_id": "G104",
+			"details": "Errors unhandled",
+			"file": "/home/user/tfpipboy/pkg/orchestrator/terraform_output_filter.go",
+			"code": "140: \t\t\tfmt.Fprintf(debugFile, \"[%s] MATCHED RESOURCE CHANGE: %s\\n\", f.instanceID, formatted)\n141: \t\t\tdebugFile.Close()\n142: \t\t}\n",
+			"line": "141",
+			"column": "4",
+			"nosec": false,
+			"suppressions": null
+		},
+		{
+			"severity": "LOW",
+			"confidence": "HIGH",
+			"cwe": {
+				"id": "703",
+				"url": "https://cwe.mitre.org/data/definitions/703.html"
+			},
+			"rule_id": "G104",
+			"details": "Errors unhandled",
+			"file": "/home/user/tfpipboy/pkg/orchestrator/terraform_output_filter.go",
+			"code": "100: \t\t\tfmt.Fprintf(debugFile, \"[%s] MATCHED: no changes\\n\", f.instanceID)\n101: \t\t\tdebugFile.Close()\n102: \t\t}\n",
+			"line": "101",
+			"column": "4",
+			"nosec": false,
+			"suppressions": null
+		},
+		{
+			"severity": "LOW",
+			"confidence": "HIGH",
+			"cwe": {
+				"id": "703",
+				"url": "https://cwe.mitre.org/data/definitions/703.html"
+			},
+			"rule_id": "G104",
+			"details": "Errors unhandled",
+			"file": "/home/user/tfpipboy/pkg/orchestrator/terraform_output_filter.go",
+			"code": "79: \t\t\tfmt.Fprintf(debugFile, \"[%s] MATCHED: init success\\n\", f.instanceID)\n80: \t\t\tdebugFile.Close()\n81: \t\t}\n",
+			"line": "80",
+			"column": "4",
+			"nosec": false,
+			"suppressions": null
+		},
+		{
+			"severity": "LOW",
+			"confidence": "HIGH",
+			"cwe": {
+				"id": "703",
+				"url": "https://cwe.mitre.org/data/definitions/703.html"
+			},
+			"rule_id": "G104",
+			"details": "Errors unhandled",
+			"file": "/home/user/tfpipboy/pkg/orchestrator/terraform_output_filter.go",
+			"code": "69: \t\t\t\tfmt.Fprintf(debugFile, \"[%s] MATCHED: provider=%s\\n\", f.instanceID, provider)\n70: \t\t\t\tdebugFile.Close()\n71: \t\t\t}\n",
+			"line": "70",
+			"column": "5",
+			"nosec": false,
+			"suppressions": null
+		},
+		{
+			"severity": "LOW",
+			"confidence": "HIGH",
+			"cwe": {
+				"id": "703",
+				"url": "https://cwe.mitre.org/data/definitions/703.html"
+			},
+			"rule_id": "G104",
+			"details": "Errors unhandled",
+			"file": "/home/user/tfpipboy/pkg/orchestrator/terraform_output_filter.go",
+			"code": "56: \t\t\tfmt.Fprintf(debugFile, \"[%s] MATCHED: backend\\n\", f.instanceID)\n57: \t\t\tdebugFile.Close()\n58: \t\t}\n",
+			"line": "57",
+			"column": "4",
+			"nosec": false,
+			"suppressions": null
+		},
+		{
+			"severity": "LOW",
+			"confidence": "HIGH",
+			"cwe": {
+				"id": "703",
+				"url": "https://cwe.mitre.org/data/definitions/703.html"
+			},
+			"rule_id": "G104",
+			"details": "Errors unhandled",
+			"file": "/home/user/tfpipboy/pkg/orchestrator/terraform_output_filter.go",
+			"code": "48: \t\tfmt.Fprintf(debugFile, \"[%s] LINE: %q\\n\", f.instanceID, line)\n49: \t\tdebugFile.Close()\n50: \t}\n",
+			"line": "49",
+			"column": "3",
+			"nosec": false,
+			"suppressions": null
+		},
+		{
+			"severity": "LOW",
+			"confidence": "HIGH",
+			"cwe": {
+				"id": "703",
+				"url": "https://cwe.mitre.org/data/definitions/703.html"
+			},
+			"rule_id": "G104",
+			"details": "Errors unhandled",
+			"file": "/home/user/tfpipboy/pkg/orchestrator/message_pipeline.go",
+			"code": "150: \tfor _, processor := range mp.processors {\n151: \t\tprocessor.Close()\n152: \t}\n",
+			"line": "151",
+			"column": "3",
+			"nosec": false,
+			"suppressions": null
+		},
+		{
+			"severity": "LOW",
+			"confidence": "HIGH",
+			"cwe": {
+				"id": "703",
+				"url": "https://cwe.mitre.org/data/definitions/703.html"
+			},
+			"rule_id": "G104",
+			"details": "Errors unhandled",
+			"file": "/home/user/tfpipboy/pkg/orchestrator/liveboard.go",
+			"code": "554: \tstdoutMutex.Lock()\n555: \tio.WriteString(lb.stdout, buf.String())\n556: \tstdoutMutex.Unlock()\n",
+			"line": "555",
+			"column": "2",
+			"nosec": false,
+			"suppressions": null
+		},
+		{
+			"severity": "LOW",
+			"confidence": "HIGH",
+			"cwe": {
+				"id": "703",
+				"url": "https://cwe.mitre.org/data/definitions/703.html"
+			},
+			"rule_id": "G104",
+			"details": "Errors unhandled",
+			"file": "/home/user/tfpipboy/pkg/orchestrator/graph.go",
+			"code": "365: \t// Recalculate stages for the subgraph\n366: \tb.calculateStages(subgraph)\n367: \n",
+			"line": "366",
+			"column": "2",
+			"nosec": false,
+			"suppressions": null
+		},
+		{
+			"severity": "LOW",
+			"confidence": "HIGH",
+			"cwe": {
+				"id": "703",
+				"url": "https://cwe.mitre.org/data/definitions/703.html"
+			},
+			"rule_id": "G104",
+			"details": "Errors unhandled",
+			"file": "/home/user/tfpipboy/pkg/orchestrator/errors.go",
+			"code": "315: \t\tlineNum := 0\n316: \t\tfmt.Sscanf(matches[2], \"%d\", \u0026lineNum)\n317: \t\treturn matches[1], lineNum\n",
+			"line": "316",
+			"column": "3",
+			"nosec": false,
+			"suppressions": null
+		},
+		{
+			"severity": "LOW",
+			"confidence": "HIGH",
+			"cwe": {
+				"id": "703",
+				"url": "https://cwe.mitre.org/data/definitions/703.html"
+			},
+			"rule_id": "G104",
+			"details": "Errors unhandled",
+			"file": "/home/user/tfpipboy/pkg/orchestrator/errors.go",
+			"code": "307: \t\tlineNum := 0\n308: \t\tfmt.Sscanf(matches[2], \"%d\", \u0026lineNum)\n309: \t\treturn matches[1], lineNum\n",
+			"line": "308",
+			"column": "3",
+			"nosec": false,
+			"suppressions": null
+		}
+	],
+	"Stats": {
+		"files": 37,
+		"lines": 14263,
+		"nosec": 0,
+		"found": 44
+	},
+	"GosecVersion": "dev"
+}
