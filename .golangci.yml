@@ -18,8 +18,9 @@ linters-settings:
   goimports:
     local-prefixes: github.com/StanleyXie/tfpipboy
   govet:
-    enable:
-      - shadow
+    settings:
+      shadow:
+        strict: true
   lll:
     line-length: 140
   misspell:
@@ -40,6 +41,8 @@ linters:
     - staticcheck
     - unconvert
     - unused
+    - gocritic
+    - revive
 
 formatters:
   enable:
