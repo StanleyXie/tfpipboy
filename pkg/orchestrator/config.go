@@ -607,17 +607,37 @@ func (p *ConfigParser) validateDependency(dep string, config *Config) error {
 
 // validateDependencies validates that there are no circular dependencies
 func (p *ConfigParser) validateDependencies(config *Config, result *ValidationResult) {
-	// Build dependency graph
+	// Build dependency graph with normalized keys
 	graph := make(map[string][]string)
+
+	// Helper function to resolve instance name to full key (module.instance or just instance)
+	resolveInstanceKey := func(dep string) string {
+		// First, try to find as instance name across all modules
+		for moduleName, module := range config.Modules {
+			if _, exists := module.Instances[dep]; exists {
+				return fmt.Sprintf("%s.%s", moduleName, dep)
+			}
+		}
+		// If it's already in module.instance format or is a module name, return as-is
+		return dep
+	}
 
 	// Add module dependencies
 	for name, module := range config.Modules {
-		graph[name] = module.DependsOn
+		normalizedDeps := make([]string, len(module.DependsOn))
+		for i, dep := range module.DependsOn {
+			normalizedDeps[i] = resolveInstanceKey(dep)
+		}
+		graph[name] = normalizedDeps
 
 		// Add instance dependencies
 		for instanceName, instance := range module.Instances {
 			instanceKey := fmt.Sprintf("%s.%s", name, instanceName)
-			graph[instanceKey] = instance.DependsOn
+			normalizedDeps := make([]string, len(instance.DependsOn))
+			for i, dep := range instance.DependsOn {
+				normalizedDeps[i] = resolveInstanceKey(dep)
+			}
+			graph[instanceKey] = normalizedDeps
 		}
 	}
 

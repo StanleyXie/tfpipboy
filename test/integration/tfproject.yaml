@@ -1,0 +1,333 @@
+version: "1.0"
+
+# Multi-level integration test configuration
+# Demonstrates dependency graph, parallel execution, and multi-environment orchestration
+
+modules:
+  vpc:
+    description: "Virtual Private Cloud - Foundation layer"
+    category: "networking"
+    owner: "platform-team"
+    path: "./terraform-modules/vpc"
+    backend:
+      type: "local"
+    instances:
+      vpc-dev:
+        description: "Development VPC"
+        environment: "dev"
+        region: "us-west-2"
+        variables:
+          environment: "dev"
+          cidr_block: "10.0.0.0/16"
+          region: "us-west-2"
+
+      vpc-staging:
+        description: "Staging VPC"
+        environment: "staging"
+        region: "us-west-2"
+        variables:
+          environment: "staging"
+          cidr_block: "10.1.0.0/16"
+          region: "us-west-2"
+
+      vpc-prod:
+        description: "Production VPC"
+        environment: "prod"
+        region: "us-west-2"
+        variables:
+          environment: "prod"
+          cidr_block: "10.2.0.0/16"
+          region: "us-west-2"
+
+  subnet:
+    description: "Subnets - Network segmentation layer"
+    category: "networking"
+    owner: "platform-team"
+    path: "./terraform-modules/subnet"
+    backend:
+      type: "local"
+    instances:
+      subnet-dev-public:
+        description: "Development public subnet"
+        environment: "dev"
+        region: "us-west-2"
+        depends_on:
+          - vpc-dev
+        variables:
+          environment: "dev"
+          vpc_cidr: "10.0.0.0/16"
+          subnet_suffix: "public"
+          availability_zone: "us-west-2a"
+
+      subnet-dev-private:
+        description: "Development private subnet"
+        environment: "dev"
+        region: "us-west-2"
+        depends_on:
+          - vpc-dev
+        variables:
+          environment: "dev"
+          vpc_cidr: "10.0.0.0/16"
+          subnet_suffix: "private"
+          availability_zone: "us-west-2b"
+
+      subnet-staging-public:
+        description: "Staging public subnet"
+        environment: "staging"
+        region: "us-west-2"
+        depends_on:
+          - vpc-staging
+        variables:
+          environment: "staging"
+          vpc_cidr: "10.1.0.0/16"
+          subnet_suffix: "public"
+          availability_zone: "us-west-2a"
+
+      subnet-staging-private:
+        description: "Staging private subnet"
+        environment: "staging"
+        region: "us-west-2"
+        depends_on:
+          - vpc-staging
+        variables:
+          environment: "staging"
+          vpc_cidr: "10.1.0.0/16"
+          subnet_suffix: "private"
+          availability_zone: "us-west-2b"
+
+  application:
+    description: "Application deployments"
+    category: "compute"
+    owner: "app-team"
+    path: "./terraform-modules/application"
+    backend:
+      type: "local"
+    instances:
+      app-dev-frontend:
+        description: "Development frontend application"
+        environment: "dev"
+        region: "us-west-2"
+        depends_on:
+          - subnet-dev-public
+        variables:
+          environment: "dev"
+          app_name: "frontend"
+          subnet_id: "subnet-dev-public-example"
+          instance_count: 2
+
+      app-dev-backend:
+        description: "Development backend application"
+        environment: "dev"
+        region: "us-west-2"
+        depends_on:
+          - subnet-dev-private
+        variables:
+          environment: "dev"
+          app_name: "backend"
+          subnet_id: "subnet-dev-private-example"
+          instance_count: 3
+
+      app-staging-frontend:
+        description: "Staging frontend application"
+        environment: "staging"
+        region: "us-west-2"
+        depends_on:
+          - subnet-staging-public
+        variables:
+          environment: "staging"
+          app_name: "frontend"
+          subnet_id: "subnet-staging-public-example"
+          instance_count: 2
+
+      app-staging-backend:
+        description: "Staging backend application"
+        environment: "staging"
+        region: "us-west-2"
+        depends_on:
+          - subnet-staging-private
+        variables:
+          environment: "staging"
+          app_name: "backend"
+          subnet_id: "subnet-staging-private-example"
+          instance_count: 3
+
+  database:
+    description: "Database instances"
+    category: "data"
+    owner: "data-team"
+    path: "./terraform-modules/database"
+    backend:
+      type: "local"
+    instances:
+      db-dev:
+        description: "Development database"
+        environment: "dev"
+        region: "us-west-2"
+        depends_on:
+          - subnet-dev-private
+        variables:
+          environment: "dev"
+          database_name: "appdb"
+          subnet_id: "subnet-dev-private-example"
+          engine: "postgres"
+          engine_version: "14.0"
+
+      db-staging:
+        description: "Staging database"
+        environment: "staging"
+        region: "us-west-2"
+        depends_on:
+          - subnet-staging-private
+        variables:
+          environment: "staging"
+          database_name: "appdb"
+          subnet_id: "subnet-staging-private-example"
+          engine: "postgres"
+          engine_version: "14.0"
+
+# Groups for easier targeting
+groups:
+  networking:
+    - vpc-dev
+    - vpc-staging
+    - subnet-dev-public
+    - subnet-dev-private
+    - subnet-staging-public
+    - subnet-staging-private
+
+  dev-environment:
+    - vpc-dev
+    - subnet-dev-public
+    - subnet-dev-private
+    - app-dev-frontend
+    - app-dev-backend
+    - db-dev
+
+  staging-environment:
+    - vpc-staging
+    - subnet-staging-public
+    - subnet-staging-private
+    - app-staging-frontend
+    - app-staging-backend
+    - db-staging
+
+  all-infrastructure:
+    - networking
+    - dev-environment
+    - staging-environment
+
+# Pipelines for orchestrated deployment
+pipelines:
+  deploy-dev:
+    description: "Deploy complete development environment"
+    default_operation: "apply"
+    require_confirmation: false
+    settings:
+      parallel_limit: 4
+      timeout: 30m
+      auto_approve: true
+
+    stages:
+      - name: "Foundation"
+        description: "Deploy VPC"
+        modules:
+          - vpc-dev
+        parallel: false
+
+      - name: "Networking"
+        description: "Deploy subnets"
+        modules:
+          - subnet-dev-public
+          - subnet-dev-private
+        parallel: true
+
+      - name: "Data Layer"
+        description: "Deploy database"
+        modules:
+          - db-dev
+        parallel: false
+
+      - name: "Application Layer"
+        description: "Deploy applications"
+        modules:
+          - app-dev-frontend
+          - app-dev-backend
+        parallel: true
+
+  deploy-staging:
+    description: "Deploy complete staging environment"
+    default_operation: "apply"
+    require_confirmation: true
+    confirmation_message: "Are you sure you want to deploy to STAGING?"
+    settings:
+      parallel_limit: 4
+      timeout: 30m
+
+    stages:
+      - name: "Foundation"
+        description: "Deploy VPC"
+        modules:
+          - vpc-staging
+        parallel: false
+
+      - name: "Networking"
+        description: "Deploy subnets"
+        modules:
+          - subnet-staging-public
+          - subnet-staging-private
+        parallel: true
+
+      - name: "Data Layer"
+        description: "Deploy database"
+        modules:
+          - db-staging
+        parallel: false
+
+      - name: "Application Layer"
+        description: "Deploy applications"
+        modules:
+          - app-staging-frontend
+          - app-staging-backend
+        parallel: true
+
+  full-stack:
+    description: "Deploy all environments (dev + staging)"
+    default_operation: "apply"
+    require_confirmation: true
+    confirmation_message: "This will deploy ALL environments. Continue?"
+    settings:
+      parallel_limit: 8
+      timeout: 60m
+
+    stages:
+      - name: "VPCs"
+        description: "Deploy all VPCs in parallel"
+        modules:
+          - vpc-dev
+          - vpc-staging
+        parallel: true
+
+      - name: "Subnets"
+        description: "Deploy all subnets in parallel"
+        modules:
+          - subnet-dev-public
+          - subnet-dev-private
+          - subnet-staging-public
+          - subnet-staging-private
+        parallel: true
+
+      - name: "Databases"
+        description: "Deploy all databases in parallel"
+        modules:
+          - db-dev
+          - db-staging
+        parallel: true
+
+      - name: "Applications"
+        description: "Deploy all applications in parallel"
+        modules:
+          - app-dev-frontend
+          - app-dev-backend
+          - app-staging-frontend
+          - app-staging-backend
+        parallel: true
