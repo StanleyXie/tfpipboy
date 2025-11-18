@@ -102,7 +102,7 @@ jobs:
         run: go build -v -o bin/tfpipboy${{ matrix.os == 'windows-latest' && '.exe' || '' }} ./cmd/tfpipboy
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: tfpipboy-${{ matrix.os }}
           path: bin/tfpipboy${{ matrix.os == 'windows-latest' && '.exe' || '' }}
