@@ -399,7 +399,7 @@ func FormatVersionDiff(diff *VersionDiff) string {
 
 	// Summary
 	s := diff.Summary
-	sb.WriteString(fmt.Sprintf("Summary:\n"))
+	sb.WriteString("Summary:\n")
 	sb.WriteString(fmt.Sprintf("  Resources: %d unchanged, %d changed, %d added, %d removed\n",
 		s.TotalResourcesUnchanged, s.TotalResourcesChanged, s.TotalResourcesAdded, s.TotalResourcesRemoved))
 	sb.WriteString(fmt.Sprintf("  Attributes: %d changed\n", s.TotalAttributesChanged))

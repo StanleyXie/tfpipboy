@@ -1,3 +1,5 @@
+// Package state provides terraform state tracking, change detection, and drift analysis.
+// It implements a Change Data Capture (CDC) pattern inspired by database systems.
 package state
 
 import (
@@ -46,10 +48,15 @@ type ResourceDiff struct {
 type ResourceChangeType string
 
 const (
-	ChangeTypeAdded     ResourceChangeType = "added"
-	ChangeTypeRemoved   ResourceChangeType = "removed"
-	ChangeTypeModified  ResourceChangeType = "modified"
+	// ChangeTypeAdded indicates a resource was added
+	ChangeTypeAdded ResourceChangeType = "added"
+	// ChangeTypeRemoved indicates a resource was removed
+	ChangeTypeRemoved ResourceChangeType = "removed"
+	// ChangeTypeModified indicates a resource was modified
+	ChangeTypeModified ResourceChangeType = "modified"
+	// ChangeTypeRecreated indicates a resource was recreated
 	ChangeTypeRecreated ResourceChangeType = "recreated"
+	// ChangeTypeUnchanged indicates no change occurred
 	ChangeTypeUnchanged ResourceChangeType = "unchanged"
 )
 
@@ -57,9 +64,12 @@ const (
 type ChangeImpact string
 
 const (
-	ImpactLow    ChangeImpact = "low"    // Config changes, tags
-	ImpactMedium ChangeImpact = "medium" // Non-destructive updates
-	ImpactHigh   ChangeImpact = "high"   // Recreates, deletions
+	// ImpactLow indicates low-impact changes like config or tags
+	ImpactLow ChangeImpact = "low"
+	// ImpactMedium indicates medium-impact changes like non-destructive updates
+	ImpactMedium ChangeImpact = "medium"
+	// ImpactHigh indicates high-impact changes like recreates or deletions
+	ImpactHigh ChangeImpact = "high"
 )
 
 // OutputChange represents a change in Terraform outputs
