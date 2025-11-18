@@ -11,6 +11,7 @@ type Manager struct {
 	snapshotManager SnapshotManager
 	changeTracker   ChangeTracker
 	driftDetector   DriftDetector
+	diffAnalyzer    DiffAnalyzer
 }
 
 // NewManager creates a new state manager with all components initialized
@@ -25,12 +26,14 @@ func NewManager(baseDir string) (*Manager, error) {
 	snapshotManager := NewSnapshotManager(storage)
 	changeTracker := NewChangeTracker(storage)
 	driftDetector := NewDriftDetector(storage, snapshotManager)
+	diffAnalyzer := NewDiffAnalyzer(storage, snapshotManager, changeTracker)
 
 	return &Manager{
 		storage:         storage,
 		snapshotManager: snapshotManager,
 		changeTracker:   changeTracker,
 		driftDetector:   driftDetector,
+		diffAnalyzer:    diffAnalyzer,
 	}, nil
 }
 
@@ -104,4 +107,24 @@ func (m *Manager) GetLatestDriftReport(workspaceID string) (*DriftReport, error)
 
 	// Reports are already sorted by timestamp (descending)
 	return &reports[0], nil
+}
+
+// DiffVersions compares two specific versions
+func (m *Manager) DiffVersions(workspaceID string, fromVersion, toVersion int) (*VersionDiff, error) {
+	return m.diffAnalyzer.DiffVersions(workspaceID, fromVersion, toVersion)
+}
+
+// GetVersionChanges gets changes for a specific version (compared to previous)
+func (m *Manager) GetVersionChanges(workspaceID string, version int) (*VersionDiff, error) {
+	return m.diffAnalyzer.GetVersionChanges(workspaceID, version)
+}
+
+// GetTimeline gets a chronological view of all changes
+func (m *Manager) GetTimeline(workspaceID string) (*ChangeTimeline, error) {
+	return m.diffAnalyzer.GetTimeline(workspaceID)
+}
+
+// GetResourceHistory gets the complete history of a specific resource
+func (m *Manager) GetResourceHistory(workspaceID string, resourceAddress string) (*ResourceHistory, error) {
+	return m.diffAnalyzer.GetResourceHistory(workspaceID, resourceAddress)
 }
