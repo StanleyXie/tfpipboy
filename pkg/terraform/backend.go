@@ -1,3 +1,5 @@
+// Package terraform provides utilities for interacting with Terraform state,
+// configuration, and backend information.
 package terraform
 
 import (
@@ -181,7 +183,11 @@ func GetBackendSummary(backend *BackendConfig) string {
 		return "HTTP"
 
 	default:
-		return strings.Title(backend.Type)
+		// Capitalize first letter of backend type
+		if len(backend.Type) == 0 {
+			return backend.Type
+		}
+		return strings.ToUpper(backend.Type[:1]) + backend.Type[1:]
 	}
 }
 

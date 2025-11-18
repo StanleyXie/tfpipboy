@@ -144,7 +144,7 @@ func (e *TerraformExecutor) executeInit(ctx context.Context, job *ExecutionJob, 
 			if authStatus.Error != "" {
 				errMsg += fmt.Sprintf("Details: %s\n", authStatus.Error)
 			}
-			errMsg += fmt.Sprintf("\nPlease authenticate before running Terraform:\n")
+			errMsg += "\nPlease authenticate before running Terraform:\n"
 			authCmd := GetAuthenticationCommand(workspace.Backend.Type)
 			if authCmd != "" {
 				errMsg += fmt.Sprintf("  $ %s\n", authCmd)
@@ -333,10 +333,14 @@ func (e *TerraformExecutor) executePlan(ctx context.Context, job *ExecutionJob, 
 	// If plan succeeded, save JSON and human-readable outputs
 	if err == nil {
 		// Generate JSON plan output
-		e.savePlanJSON(ctx, job, workspace, planFile, planJSONFile)
+		if planErr := e.savePlanJSON(ctx, job, workspace, planFile, planJSONFile); planErr != nil {
+			fmt.Fprintf(os.Stderr, "Warning: failed to save plan JSON: %v\n", planErr)
+		}
 
 		// Generate human-readable plan output
-		e.savePlanText(ctx, job, workspace, planFile, planTextFile, suppressOutput)
+		if planErr := e.savePlanText(ctx, job, workspace, planFile, planTextFile, suppressOutput); planErr != nil {
+			fmt.Fprintf(os.Stderr, "Warning: failed to save plan text: %v\n", planErr)
+		}
 
 		// Display plan summary with artifacts
 		if !suppressOutput {
@@ -609,10 +613,14 @@ func (e *TerraformExecutor) runTerraformCommand(ctx context.Context, job *Execut
 		logFile = nil // Continue without log file
 	}
 	if logFile != nil {
-		defer logFile.Close()
+		defer func() {
+			if err := logFile.Close(); err != nil {
+				e.logger.Warn("Failed to close log file", "error", err)
+			}
+		}()
 
 		// Write header to log file
-		header := fmt.Sprintf("=== Terraform Command Log ===\n")
+		header := "=== Terraform Command Log ===\n"
 		header += fmt.Sprintf("Instance ID: %s\n", job.ID)
 		header += fmt.Sprintf("Module: %s\n", job.ModuleName)
 		if job.InstanceName != "" {
@@ -622,8 +630,10 @@ func (e *TerraformExecutor) runTerraformCommand(ctx context.Context, job *Execut
 		header += fmt.Sprintf("Command: terraform %s\n", strings.Join(args, " "))
 		header += fmt.Sprintf("Working Dir: %s\n", cmd.Dir)
 		header += fmt.Sprintf("Time: %s\n", time.Now().Format("2006-01-02 15:04:05"))
-		header += fmt.Sprintf("=============================\n\n")
-		logFile.WriteString(header)
+		header += "=============================\n\n"
+		if _, err := logFile.WriteString(header); err != nil {
+			e.logger.Warn("Failed to write log header", "error", err)
+		}
 	}
 
 	// Create pipes for stdout and stderr
@@ -754,7 +764,9 @@ monitorLoop:
 					}
 
 					// Kill the hung init process
-					cmd.Process.Kill()
+					if err := cmd.Process.Kill(); err != nil {
+						e.logger.Warn("Failed to kill hung process", "error", err)
+					}
 					break monitorLoop
 				}
 
@@ -774,7 +786,9 @@ monitorLoop:
 			// Context timeout or cancellation
 			if cmd.Process != nil {
 				e.logger.Warn("Terraform process timeout, killing process", "job_id", job.ID, "timeout", e.timeout)
-				cmd.Process.Kill()
+				if err := cmd.Process.Kill(); err != nil {
+					e.logger.Warn("Failed to kill timed out process", "error", err)
+				}
 			}
 			cmdErr = fmt.Errorf("terraform command timed out after %v", e.timeout)
 			break monitorLoop
@@ -824,25 +838,31 @@ monitorLoop:
 
 		// Write footer to log file with error details
 		if logFile != nil {
-			footer := fmt.Sprintf("\n=============================\n")
+			footer := "\n=============================\n"
 			footer += fmt.Sprintf("Completed: %s\n", time.Now().Format("2006-01-02 15:04:05"))
-			footer += fmt.Sprintf("Status: FAILED\n")
+			footer += "Status: FAILED\n"
 			footer += fmt.Sprintf("Exit Code: %v\n", err)
 			footer += fmt.Sprintf("Error Category: %s\n", tfError.Category)
-			footer += fmt.Sprintf("=============================\n")
-			footer += fmt.Sprintf("\n=== ERROR SUMMARY ===\n")
+			footer += "=============================\n"
+			footer += "\n=== ERROR SUMMARY ===\n"
 			footer += tfError.Details
-			footer += fmt.Sprintf("\n=====================\n")
-			logFile.WriteString(footer)
+			footer += "\n=====================\n"
+			if _, err := logFile.WriteString(footer); err != nil {
+				e.logger.Warn("Failed to write log footer", "error", err)
+			}
 		}
 
 		// Create error log file in persistent logs directory
 		errorLogPath := filepath.Join(workspace.LogDir, fmt.Sprintf("%s-error.log", job.ID))
 		if errorFile, errCreate := os.Create(errorLogPath); errCreate == nil {
-			defer errorFile.Close()
+			defer func() {
+				if err := errorFile.Close(); err != nil {
+					e.logger.Warn("Failed to close error log file", "error", err)
+				}
+			}()
 
 			// Write error log header
-			errorHeader := fmt.Sprintf("=== TERRAFORM ERROR LOG ===\n")
+			errorHeader := "=== TERRAFORM ERROR LOG ===\n"
 			errorHeader += fmt.Sprintf("Instance ID: %s\n", job.ID)
 			errorHeader += fmt.Sprintf("Module: %s\n", job.ModuleName)
 			if job.InstanceName != "" {
@@ -859,23 +879,25 @@ monitorLoop:
 					errorHeader += fmt.Sprintf("File: %s\n", tfError.FilePath)
 				}
 			}
-			errorHeader += fmt.Sprintf("===========================\n\n")
-			errorFile.WriteString(errorHeader)
+			errorHeader += "===========================\n\n"
+			if _, err := errorFile.WriteString(errorHeader); err != nil {
+				e.logger.Warn("Failed to write error header", "error", err)
+			}
 
 			// Write categorized error details
-			errorFile.WriteString("=== ERROR DETAILS ===\n")
-			errorFile.WriteString(tfError.Details)
-			errorFile.WriteString("\n\n")
+			_, _ = errorFile.WriteString("=== ERROR DETAILS ===\n")
+			_, _ = errorFile.WriteString(tfError.Details)
+			_, _ = errorFile.WriteString("\n\n")
 
 			// Write resolution suggestion
 			if tfError.Resolution != "" {
-				errorFile.WriteString("=== SUGGESTED RESOLUTION ===\n")
-				errorFile.WriteString(tfError.Resolution)
-				errorFile.WriteString("\n\n")
+				_, _ = errorFile.WriteString("=== SUGGESTED RESOLUTION ===\n")
+				_, _ = errorFile.WriteString(tfError.Resolution)
+				_, _ = errorFile.WriteString("\n\n")
 			}
 
-			errorFile.WriteString("=== FULL OUTPUT ===\n")
-			errorFile.WriteString(job.Output)
+			_, _ = errorFile.WriteString("=== FULL OUTPUT ===\n")
+			_, _ = errorFile.WriteString(job.Output)
 
 			// Only log error when liveboard is not active
 			if !suppressOutput {
@@ -901,11 +923,13 @@ monitorLoop:
 
 	// Write success footer to log file
 	if logFile != nil {
-		footer := fmt.Sprintf("\n=============================\n")
+		footer := "\n=============================\n"
 		footer += fmt.Sprintf("Completed: %s\n", time.Now().Format("2006-01-02 15:04:05"))
-		footer += fmt.Sprintf("Status: SUCCESS\n")
-		footer += fmt.Sprintf("=============================\n")
-		logFile.WriteString(footer)
+		footer += "Status: SUCCESS\n"
+		footer += "=============================\n"
+		if _, err := logFile.WriteString(footer); err != nil {
+			e.logger.Warn("Failed to write success footer", "error", err)
+		}
 	}
 
 	return nil
@@ -955,7 +979,7 @@ func (e *TerraformExecutor) streamOutput(reader io.Reader, builder *strings.Buil
 		// NOTE: This is the OLD log file system - will be replaced by message pipeline log
 		if logFile != nil {
 			logLine := fmt.Sprintf("[%s] %s\n", prefix, cleanLine)
-			logFile.WriteString(logLine)
+			_, _ = logFile.WriteString(logLine)
 		}
 
 		// Log the line (with error highlighting)
@@ -1363,7 +1387,7 @@ func (e *TerraformExecutor) saveJobMetadata(job *ExecutionJob, workspace *Worksp
 // calculateDirSize calculates the total size of a directory
 func (e *TerraformExecutor) calculateDirSize(path string) int64 {
 	var size int64
-	filepath.Walk(path, func(_ string, info os.FileInfo, err error) error {
+	_ = filepath.Walk(path, func(_ string, info os.FileInfo, err error) error {
 		if err != nil {
 			return nil
 		}
@@ -1534,7 +1558,7 @@ func (e *TerraformExecutor) streamOutputWithMonitoring(reader io.Reader, builder
 		// Write to log file if available (strip ANSI codes for clean logs)
 		if logFile != nil {
 			logLine := fmt.Sprintf("[%s] %s\n", prefix, cleanLine)
-			logFile.WriteString(logLine)
+			_, _ = logFile.WriteString(logLine)
 		}
 
 		// Log the line (with error highlighting)

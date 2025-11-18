@@ -1,3 +1,5 @@
+// Package cli provides an interactive command-line wrapper for Terraform
+// with context-aware status display and command history management.
 package cli
 
 import (
@@ -84,7 +86,9 @@ func (w *Wrapper) setupHistoryFile() error {
 		if err != nil {
 			return fmt.Errorf("failed to create history file: %w", err)
 		}
-		f.Close()
+		if err := f.Close(); err != nil {
+			return fmt.Errorf("failed to close history file: %w", err)
+		}
 	} else {
 		// File exists, ensure permissions are correct
 		if err := os.Chmod(w.historyFile, historyFileMode); err != nil {
@@ -105,7 +109,12 @@ func (w *Wrapper) trimHistoryFile() error {
 		}
 		return fmt.Errorf("failed to open history file: %w", err)
 	}
-	defer file.Close()
+	defer func() {
+		if err := file.Close(); err != nil {
+			// Log error but don't override return value
+			fmt.Fprintf(os.Stderr, "warning: failed to close history file: %v\n", err)
+		}
+	}()
 
 	// Read all lines
 	var lines []string
@@ -131,11 +140,14 @@ func (w *Wrapper) trimHistoryFile() error {
 
 		writer := bufio.NewWriter(f)
 		for _, line := range lines {
-			fmt.Fprintln(writer, line)
+			if _, err := fmt.Fprintln(writer, line); err != nil {
+				_ = f.Close()
+				return fmt.Errorf("failed to write to history file: %w", err)
+			}
 		}
 
 		if err := writer.Flush(); err != nil {
-			f.Close()
+			_ = f.Close()
 			return fmt.Errorf("failed to write history file: %w", err)
 		}
 
@@ -176,14 +188,18 @@ func (w *Wrapper) Run() error {
 	if err != nil {
 		return fmt.Errorf("failed to create readline: %w", err)
 	}
-	defer rl.Close()
+	defer func() {
+		if err := rl.Close(); err != nil {
+			fmt.Fprintf(os.Stderr, "warning: failed to close readline: %v\n", err)
+		}
+	}()
 
 	// Handle Ctrl+C gracefully
 	sigChan := make(chan os.Signal, 1)
 	signal.Notify(sigChan, os.Interrupt, syscall.SIGTERM)
 	go func() {
 		<-sigChan
-		rl.Close()
+		_ = rl.Close()
 		fmt.Println("\nGoodbye!")
 		os.Exit(0)
 	}()

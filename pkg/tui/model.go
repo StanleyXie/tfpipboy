@@ -1,3 +1,5 @@
+// Package tui provides a terminal user interface for interactive Terraform
+// command execution with real-time output streaming.
 package tui
 
 import (

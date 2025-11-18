@@ -81,9 +81,9 @@ func (p *ProgressDisplay) StartOperation(jobID, moduleName string, op TerraformO
 	opLabel := p.formatOperationLabel(op, StatusRunning)
 
 	if p.useColors {
-		fmt.Fprintf(p.stdout, "[%s] %s %s... ", colorGray+timestamp+colorReset, opLabel, moduleName)
+		_, _ = fmt.Fprintf(p.stdout, "[%s] %s %s... ", colorGray+timestamp+colorReset, opLabel, moduleName)
 	} else {
-		fmt.Fprintf(p.stdout, "[%s] %s %s... ", timestamp, opLabel, moduleName)
+		_, _ = fmt.Fprintf(p.stdout, "[%s] %s %s... ", timestamp, opLabel, moduleName)
 	}
 
 	go p.animateOperation()
@@ -105,7 +105,7 @@ func (p *ProgressDisplay) StopOperation(status OperationStatus, details string) 
 	statusIcon := p.getStatusIcon(status)
 
 	if p.useColors {
-		fmt.Fprintf(p.stdout, "[%s] %s %s %s (%s)%s\n",
+		_, _ = fmt.Fprintf(p.stdout, "[%s] %s %s %s (%s)%s\n",
 			colorGray+timestamp+colorReset,
 			statusIcon,
 			opLabel,
@@ -113,7 +113,7 @@ func (p *ProgressDisplay) StopOperation(status OperationStatus, details string) 
 			elapsed,
 			p.formatDetails(details))
 	} else {
-		fmt.Fprintf(p.stdout, "[%s] %s %s %s (%s)%s\n",
+		_, _ = fmt.Fprintf(p.stdout, "[%s] %s %s %s (%s)%s\n",
 			timestamp,
 			statusIcon,
 			opLabel,
@@ -150,9 +150,10 @@ func (p *ProgressDisplay) formatOperationLabel(op TerraformOperation, status Ope
 	}
 
 	// Adjust color based on status
-	if status == StatusSuccess {
+	switch status {
+	case StatusSuccess:
 		color = colorGreen
-	} else if status == StatusFailed {
+	case StatusFailed:
 		color = colorRed
 	}
 
@@ -218,7 +219,7 @@ func (p *ProgressDisplay) animateOperation() {
 
 		// Overwrite the ellipsis with spinner and time
 		if p.useColors {
-			fmt.Fprintf(p.stdout, "\r[%s] %s %s... %s%s%s (%s)",
+			_, _ = fmt.Fprintf(p.stdout, "\r[%s] %s %s... %s%s%s (%s)",
 				colorGray+time.Now().Format("15:04:05")+colorReset,
 				p.formatOperationLabel(p.currentOp, StatusRunning),
 				p.moduleName,
@@ -227,7 +228,7 @@ func (p *ProgressDisplay) animateOperation() {
 				colorReset,
 				elapsed)
 		} else {
-			fmt.Fprintf(p.stdout, "\r[%s] %s %s... %s (%s)",
+			_, _ = fmt.Fprintf(p.stdout, "\r[%s] %s %s... %s (%s)",
 				time.Now().Format("15:04:05"),
 				p.formatOperationLabel(p.currentOp, StatusRunning),
 				p.moduleName,
@@ -249,7 +250,7 @@ func (p *ProgressDisplay) Update(message string) {
 
 // clearLine clears the current terminal line
 func (p *ProgressDisplay) clearLine() {
-	fmt.Fprint(p.stdout, "\r\033[K")
+	_, _ = fmt.Fprint(p.stdout, "\r\033[K")
 }
 
 // TerraformOutputParser parses and deduplicates terraform output
@@ -306,8 +307,8 @@ func (p *TerraformOutputParser) ParseLine(line string) (shouldPrint bool, format
 		p.planSummary = cleanLine
 		// Debug
 		if debugFile, _ := os.OpenFile("/tmp/tfpipboy-parser-debug.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0600); debugFile != nil {
-			fmt.Fprintf(debugFile, "[ParseLine] Captured plan summary: %s\n", cleanLine)
-			debugFile.Close()
+			_, _ = fmt.Fprintf(debugFile, "[ParseLine] Captured plan summary: %s\n", cleanLine)
+			_ = debugFile.Close()
 		}
 		return false, "" // Don't print here, will show in StopOperation
 	}
@@ -317,8 +318,8 @@ func (p *TerraformOutputParser) ParseLine(line string) (shouldPrint bool, format
 		p.planSummary = "No changes. Your infrastructure matches the configuration."
 		// Debug
 		if debugFile, _ := os.OpenFile("/tmp/tfpipboy-parser-debug.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0600); debugFile != nil {
-			fmt.Fprintf(debugFile, "[ParseLine] Captured no changes\n")
-			debugFile.Close()
+			_, _ = fmt.Fprintf(debugFile, "[ParseLine] Captured no changes\n")
+			_ = debugFile.Close()
 		}
 		return false, ""
 	}
@@ -435,10 +436,11 @@ func ExecutionSummary(result *ExecutionResult, artifacts bool) string {
 			// Status indicator
 			statusIndicator := "✓"
 			statusColor := colorGreen
-			if job.Status == JobStatusFailed {
+			switch job.Status {
+			case JobStatusFailed:
 				statusIndicator = "✗"
 				statusColor = colorRed
-			} else if job.Status == JobStatusSkipped {
+			case JobStatusSkipped:
 				statusIndicator = "○"
 				statusColor = colorYellow
 			}
