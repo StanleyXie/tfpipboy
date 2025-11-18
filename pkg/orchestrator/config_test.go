@@ -736,3 +736,201 @@ func TestValidationResult(t *testing.T) {
 		t.Error("Report should contain warnings header")
 	}
 }
+
+// TestProcessBackendConfig tests backend configuration processing
+func TestProcessBackendConfig(t *testing.T) {
+	tmpDir := t.TempDir()
+	parser := NewConfigParser(tmpDir)
+
+	tests := []struct {
+		name     string
+		backend  *BackendConfig
+		expected string // Expected backend type
+	}{
+		{
+			name: "azurerm backend with subscription",
+			backend: &BackendConfig{
+				SubscriptionID:     "sub-123",
+				StorageAccountName: "myaccount",
+			},
+			expected: "azurerm",
+		},
+		{
+			name: "local backend default",
+			backend: &BackendConfig{
+				Type: "",
+			},
+			expected: "local",
+		},
+		{
+			name: "explicit backend type",
+			backend: &BackendConfig{
+				Type: "s3",
+			},
+			expected: "s3",
+		},
+		{
+			name: "backend with relative file path",
+			backend: &BackendConfig{
+				Type: "local",
+				File: "relative/backend.hcl",
+			},
+			expected: "local",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := parser.processBackendConfig(tt.backend)
+			if err != nil {
+				t.Errorf("Unexpected error: %v", err)
+			}
+
+			if tt.backend.Type != tt.expected {
+				t.Errorf("Expected backend type '%s', got '%s'", tt.expected, tt.backend.Type)
+			}
+
+			// If file path was relative, should be converted to absolute
+			if tt.backend.File != "" && tt.name == "backend with relative file path" {
+				if !filepath.IsAbs(tt.backend.File) {
+					t.Error("Expected file path to be converted to absolute")
+				}
+				expectedPath := filepath.Join(tmpDir, "relative/backend.hcl")
+				if tt.backend.File != expectedPath {
+					t.Errorf("Expected path '%s', got '%s'", expectedPath, tt.backend.File)
+				}
+			}
+		})
+	}
+}
+
+// TestProcessVariableConfig tests variable configuration processing
+func TestProcessVariableConfig(t *testing.T) {
+	tmpDir := t.TempDir()
+	parser := NewConfigParser(tmpDir)
+
+	tests := []struct {
+		name      string
+		varConfig *VariableConfig
+	}{
+		{
+			name: "single file with relative path",
+			varConfig: &VariableConfig{
+				File: "relative/vars.tfvars",
+			},
+		},
+		{
+			name: "multiple files with relative paths",
+			varConfig: &VariableConfig{
+				Files: []string{
+					"vars/dev.tfvars",
+					"vars/common.tfvars",
+				},
+			},
+		},
+		{
+			name: "mixed absolute and relative paths",
+			varConfig: &VariableConfig{
+				File: "/absolute/path/vars.tfvars",
+				Files: []string{
+					"relative/vars.tfvars",
+					"/another/absolute/path.tfvars",
+				},
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := parser.processVariableConfig(tt.varConfig)
+			if err != nil {
+				t.Errorf("Unexpected error: %v", err)
+			}
+
+			// Check single file path
+			if tt.varConfig.File != "" {
+				if !filepath.IsAbs(tt.varConfig.File) {
+					t.Error("Expected file path to be absolute")
+				}
+			}
+
+			// Check multiple file paths
+			for _, file := range tt.varConfig.Files {
+				if file != "" && !filepath.IsAbs(file) {
+					t.Errorf("Expected file path '%s' to be absolute", file)
+				}
+			}
+		})
+	}
+}
+
+// TestValidateGroup tests group validation
+func TestValidateGroup(t *testing.T) {
+	tmpDir := t.TempDir()
+	modulePath := filepath.Join(tmpDir, "terraform", "vpc")
+	if err := os.MkdirAll(modulePath, 0755); err != nil {
+		t.Fatalf("Failed to create module directory: %v", err)
+	}
+
+	tests := []struct {
+		name        string
+		groupName   string
+		modules     []string
+		config      *Config
+		expectError bool
+	}{
+		{
+			name:      "valid group",
+			groupName: "infrastructure",
+			modules:   []string{"vpc"},
+			config: &Config{
+				Modules: map[string]*Module{
+					"vpc": {
+						Name: "vpc",
+						Path: modulePath,
+					},
+				},
+			},
+			expectError: false,
+		},
+		{
+			name:      "empty group",
+			groupName: "empty",
+			modules:   []string{},
+			config: &Config{
+				Modules: make(map[string]*Module),
+			},
+			expectError: true,
+		},
+		{
+			name:      "group with invalid module",
+			groupName: "invalid",
+			modules:   []string{"non-existent"},
+			config: &Config{
+				Modules: make(map[string]*Module),
+			},
+			expectError: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tt.config.Groups = map[string][]string{
+				tt.groupName: tt.modules,
+			}
+
+			parser := NewConfigParser(tmpDir)
+			err := parser.ValidateConfig(tt.config)
+
+			if tt.expectError {
+				if err == nil {
+					t.Fatal("Expected error but got nil")
+				}
+			} else {
+				if err != nil {
+					t.Errorf("Expected no error, got: %v", err)
+				}
+			}
+		})
+	}
+}

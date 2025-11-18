@@ -230,3 +230,162 @@ func TestManager_CheckAll_EmptyManager(t *testing.T) {
 		t.Errorf("Expected 0 results, got %d", len(results))
 	}
 }
+
+func TestManager_Check_ExistingProvider(t *testing.T) {
+	manager := &Manager{}
+
+	mock := &mockChecker{
+		name: "test-provider",
+		status: &Status{
+			Provider:      "test-provider",
+			Authenticated: true,
+			User:          "test-user",
+		},
+	}
+
+	manager.AddChecker(mock)
+
+	// Check existing provider
+	status, err := manager.Check("test-provider")
+
+	if err != nil {
+		t.Errorf("Expected no error, got %v", err)
+	}
+
+	if status == nil {
+		t.Fatal("Expected status, got nil")
+	}
+
+	if status.Provider != "test-provider" {
+		t.Errorf("Expected Provider 'test-provider', got '%s'", status.Provider)
+	}
+
+	if !status.Authenticated {
+		t.Error("Expected authenticated status")
+	}
+
+	if status.User != "test-user" {
+		t.Errorf("Expected User 'test-user', got '%s'", status.User)
+	}
+
+	if !mock.checkCalled {
+		t.Error("Expected checker to be called")
+	}
+}
+
+func TestManager_Check_NonExistingProvider(t *testing.T) {
+	manager := &Manager{}
+
+	mock := &mockChecker{
+		name: "test-provider",
+		status: &Status{
+			Provider:      "test-provider",
+			Authenticated: true,
+		},
+	}
+
+	manager.AddChecker(mock)
+
+	// Check non-existing provider
+	status, err := manager.Check("non-existing")
+
+	if err != nil {
+		t.Errorf("Expected no error, got %v", err)
+	}
+
+	if status != nil {
+		t.Errorf("Expected nil status for non-existing provider, got %v", status)
+	}
+
+	if mock.checkCalled {
+		t.Error("Expected checker not to be called for non-existing provider")
+	}
+}
+
+func TestManager_GetProviders(t *testing.T) {
+	manager := &Manager{}
+
+	mock1 := &mockChecker{name: "provider1"}
+	mock2 := &mockChecker{name: "provider2"}
+	mock3 := &mockChecker{name: "provider3"}
+
+	manager.AddChecker(mock1)
+	manager.AddChecker(mock2)
+	manager.AddChecker(mock3)
+
+	providers := manager.GetProviders()
+
+	if len(providers) != 3 {
+		t.Errorf("Expected 3 providers, got %d", len(providers))
+	}
+
+	// Convert to map for easier checking
+	providerMap := make(map[string]bool)
+	for _, p := range providers {
+		providerMap[p] = true
+	}
+
+	if !providerMap["provider1"] {
+		t.Error("Expected provider1 in list")
+	}
+	if !providerMap["provider2"] {
+		t.Error("Expected provider2 in list")
+	}
+	if !providerMap["provider3"] {
+		t.Error("Expected provider3 in list")
+	}
+}
+
+func TestManager_GetProviders_Empty(t *testing.T) {
+	manager := &Manager{}
+
+	providers := manager.GetProviders()
+
+	if providers == nil {
+		t.Error("Expected empty slice, got nil")
+	}
+
+	if len(providers) != 0 {
+		t.Errorf("Expected 0 providers, got %d", len(providers))
+	}
+}
+
+func TestManager_ClearCache(t *testing.T) {
+	manager := NewManager()
+
+	// ClearCache should not panic with builtin checkers
+	manager.ClearCache()
+
+	// Verify manager still works after clearing cache
+	providers := manager.GetProviders()
+	if len(providers) != 2 {
+		t.Errorf("Expected 2 providers after cache clear, got %d", len(providers))
+	}
+}
+
+func TestManager_ClearCache_WithMockChecker(t *testing.T) {
+	manager := &Manager{}
+
+	// Add mock checker (doesn't have cache, should be ignored)
+	mock := &mockChecker{
+		name: "test",
+		status: &Status{
+			Provider:      "test",
+			Authenticated: true,
+		},
+	}
+
+	manager.AddChecker(mock)
+
+	// ClearCache should not panic even with non-cached checkers
+	manager.ClearCache()
+
+	// Verify manager still works
+	status, err := manager.Check("test")
+	if err != nil {
+		t.Errorf("Expected no error, got %v", err)
+	}
+	if status == nil {
+		t.Error("Expected status after cache clear")
+	}
+}

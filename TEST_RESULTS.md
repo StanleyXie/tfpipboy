@@ -1,9 +1,10 @@
 # Comprehensive Test Results - tfpipboy Multi-Level Testing
 
 ## Test Execution Summary
-**Date**: November 17, 2025
+**Date**: November 18, 2025
 **Branch**: claude/add-multi-level-tests-01GNJfCHy94hUcPgPKAQrnYx
 **Status**: ✅ **ALL TESTS PASSING**
+**Update**: Coverage improvement - 88 new tests added (+111%)
 
 ---
 
@@ -11,9 +12,10 @@
 
 ### Unit Tests - PASSING ✅
 
-**Total Tests**: 79 tests across 4 packages
+**Total Tests**: 167 tests across 4 packages (+88 new tests)
 **Result**: All tests pass
-**Duration**: < 1 second (with caching)
+**Duration**: ~1 second (with caching)
+**Coverage**: 20.5% overall (+3.7% improvement)
 
 #### Test Breakdown by Package:
 
@@ -123,23 +125,27 @@ All packages pass with race detector:
 
 ### Coverage Report ✅
 
-**Overall Coverage**: 16.8% of statements
-**Improvement**: Orchestrator package coverage increased from 2.2% to 14.3% (+12.1%)
+**Overall Coverage**: 20.5% of statements (+3.7% from 16.8%)
+**Baseline Improvement**: Orchestrator package coverage increased from 2.2% (main) to 17.8% (+15.6%)
 
-**Coverage by Package**:
-| Package | Coverage | Status |
-|---------|----------|--------|
-| pkg/auth | 42.7% | ✅ Good |
-| pkg/cli | 33.3% | ✅ Good |
-| pkg/orchestrator | 14.3% | ⚠️ Improved (was 2.2%) |
-| pkg/terraform | 53.9% | ✅ Good |
-| pkg/tui | 0.0% | ⏸️ No tests yet |
-| pkg/version | 0.0% | ⏸️ No tests yet |
-| cmd/tfpipboy | 0.0% | ⏸️ No tests yet |
+**Coverage by Package** (Updated 2025-11-18):
+| Package | Previous | Current | Improvement | Status |
+|---------|----------|---------|-------------|--------|
+| pkg/auth | 42.7% | 59.0% | +16.3% | ✅ Excellent |
+| pkg/cli | 33.3% | 33.3% | - | ✅ Good |
+| pkg/orchestrator | 14.3% | 17.8% | +3.5% | ⚠️ Improved (was 2.2% on main) |
+| pkg/terraform | 53.9% | 65.4% | +11.5% | ✅ Excellent |
+| pkg/tui | 0.0% | 0.0% | - | ⏸️ No tests yet |
+| pkg/version | 0.0% | 0.0% | - | ⏸️ No tests yet |
+| cmd/tfpipboy | 0.0% | 0.0% | - | ⏸️ No tests yet |
 
-**New Test Files Added**:
-- ✅ `pkg/orchestrator/graph_test.go` (500+ lines)
-- ✅ `pkg/orchestrator/config_test.go` (400+ lines)
+**Test Files Created/Enhanced**:
+- ✅ `pkg/orchestrator/graph_test.go` (500+ lines) - Initial framework
+- ✅ `pkg/orchestrator/config_test.go` (900+ lines) - Enhanced with 3 new tests
+- ✅ `pkg/orchestrator/backend_auth_test.go` (310 lines) - **NEW** 16 tests
+- ✅ `pkg/orchestrator/auth_test.go` (270 lines) - **NEW** 18 tests
+- ✅ `pkg/auth/manager_test.go` - Enhanced with 6 new tests
+- ✅ `pkg/terraform/context_test.go` - Enhanced with 3 new tests
 
 ### Linting - REPORTING (Non-blocking) ⚠️
 

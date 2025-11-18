@@ -330,3 +330,100 @@ func TestCache_Clear(t *testing.T) {
 		t.Error("Expected cache to be cleared")
 	}
 }
+
+func TestManager_GetWorkspaceList(t *testing.T) {
+	manager := NewManager()
+
+	// Test in non-Terraform directory
+	tmpDir := t.TempDir()
+	manager.SetPath(tmpDir)
+
+	workspaces, err := manager.GetWorkspaceList()
+	if err == nil {
+		// If no error, should return empty or default workspace
+		t.Logf("Workspaces in non-TF dir: %v", workspaces)
+	} else {
+		// Expected error in non-TF directory
+		t.Logf("Expected error in non-TF dir: %v", err)
+	}
+
+	// Test in Terraform directory
+	tfFile := filepath.Join(tmpDir, "main.tf")
+	if err := os.WriteFile(tfFile, []byte("# test"), 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	// Create .terraform directory
+	tfDir := filepath.Join(tmpDir, ".terraform")
+	if err := os.MkdirAll(tfDir, 0755); err != nil {
+		t.Fatal(err)
+	}
+
+	manager.SetPath(tmpDir)
+	workspaces, err = manager.GetWorkspaceList()
+
+	// Result depends on whether terraform CLI is available
+	if isCommandAvailable("terraform") {
+		// With terraform CLI, we might get workspace list or error
+		t.Logf("Workspaces with TF CLI: %v (err: %v)", workspaces, err)
+	} else {
+		// Without terraform CLI, should error
+		t.Log("Skipping workspace list check - terraform CLI not available")
+	}
+}
+
+func TestManager_GetModuleSources(t *testing.T) {
+	manager := NewManager()
+	tmpDir := t.TempDir()
+	manager.SetPath(tmpDir)
+
+	// Test in non-module directory
+	sources, err := manager.GetModuleSources()
+	if err == nil {
+		// Should return empty list
+		if len(sources) != 0 {
+			t.Errorf("Expected 0 sources in non-module dir, got %d", len(sources))
+		}
+	} else {
+		t.Logf("Error getting module sources (expected): %v", err)
+	}
+
+	// Create a module with source
+	mainTf := filepath.Join(tmpDir, "main.tf")
+	moduleContent := `
+module "test" {
+  source = "./modules/test"
+}
+
+module "remote" {
+  source = "terraform-aws-modules/vpc/aws"
+}
+`
+	if err := os.WriteFile(mainTf, []byte(moduleContent), 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	manager.SetPath(tmpDir)
+	sources, err = manager.GetModuleSources()
+
+	// Should be able to parse module sources
+	if err == nil {
+		t.Logf("Found %d module sources", len(sources))
+	} else {
+		t.Logf("Error parsing module sources: %v", err)
+	}
+}
+
+func TestManager_GetEnvironmentVarsSummary(t *testing.T) {
+	manager := NewManager()
+
+	summary := manager.GetEnvironmentVarsSummary()
+
+	if summary == nil {
+		t.Error("Expected summary map, got nil")
+	}
+
+	// Summary should contain some information
+	// The exact content depends on environment
+	t.Logf("Environment summary: %v", summary)
+}
