@@ -82,7 +82,7 @@ func (dd *driftDetector) DetectDrift(workspaceID string, planOutput string) (*Dr
 }
 
 // DetectDriftFromPlanJSON analyzes terraform plan JSON to detect drift
-func (dd *driftDetector) DetectDriftFromPlanJSON(workspaceID string, planJSON []byte) (*DriftReport, error) {
+func (dd *driftDetector) DetectDriftFromPlanJSON(_ string, _ []byte) (*DriftReport, error) {
 	// TODO: Implement JSON plan parsing for more accurate drift detection
 	// This would parse the structured JSON plan format for precise analysis
 	return nil, fmt.Errorf("JSON plan parsing not yet implemented")

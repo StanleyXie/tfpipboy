@@ -166,9 +166,10 @@ func extractResources(tfstate map[string]interface{}) ([]ResourceState, error) {
 		}
 
 		// Build address
-		if resourceState.Mode == "managed" {
+		switch resourceState.Mode {
+		case "managed":
 			resourceState.Address = fmt.Sprintf("%s.%s", resourceState.Type, resourceState.Name)
-		} else if resourceState.Mode == "data" {
+		case "data":
 			resourceState.Address = fmt.Sprintf("data.%s.%s", resourceState.Type, resourceState.Name)
 		}
 
