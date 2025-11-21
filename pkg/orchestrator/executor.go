@@ -113,6 +113,8 @@ func (e *TerraformExecutor) ExecuteJob(ctx context.Context, job *ExecutionJob, s
 		err = e.executeRefresh(ctx, job, workspace, suppressOutput)
 	case OpOutput:
 		err = e.executeOutput(ctx, job, workspace, suppressOutput)
+	case OpStateTrack:
+		err = e.executeStateTrack(ctx, job, workspace, suppressOutput)
 	default:
 		err = fmt.Errorf("unsupported operation: %s", job.Operation)
 	}
@@ -580,6 +582,43 @@ func (e *TerraformExecutor) executeOutput(ctx context.Context, job *ExecutionJob
 	args := []string{"output", "-json"}
 
 	return e.runTerraformCommand(ctx, job, workspace, args, suppressOutput)
+}
+
+// executeStateTrack captures state without modifying infrastructure
+func (e *TerraformExecutor) executeStateTrack(ctx context.Context, job *ExecutionJob, workspace *Workspace, suppressOutput bool) error {
+	// Ensure init is run first (needed for backend config)
+	if err := e.executeInit(ctx, job, workspace, suppressOutput); err != nil {
+		return fmt.Errorf("init failed: %w", err)
+	}
+
+	// Start operation display
+	displayName := job.InstanceName
+	if displayName == "" {
+		displayName = job.ModuleName
+	}
+	if !suppressOutput {
+		e.progressDisplay.StartOperation(job.ID, displayName, OpStateTrack)
+	}
+
+	// Send step update event
+	e.sendEvent(StatusUpdateEvent{
+		JobID:     job.ID,
+		EventType: "step",
+		StepName:  "State Track",
+	})
+	e.sendEvent(StatusUpdateEvent{
+		JobID:     job.ID,
+		EventType: "progress",
+		Progress:  "Capturing state...",
+	})
+
+	// Capture state (this handles local check and remote pull)
+	e.captureStateAfterApply(job, workspace, suppressOutput)
+
+	// Stop operation display
+	e.progressDisplay.StopOperation(StatusSuccess, "")
+
+	return nil
 }
 
 // addVariableArgs adds variable arguments to terraform command
@@ -1053,19 +1092,51 @@ func (e *TerraformExecutor) getModuleAndInstance(job *ExecutionJob) (*Module, *I
 
 // captureStateAfterApply captures terraform state and tracks changes after successful apply
 func (e *TerraformExecutor) captureStateAfterApply(job *ExecutionJob, workspace *Workspace, suppressOutput bool) {
-	// Find tfstate file in workspace
-	tfstatePath := filepath.Join(workspace.Path, "terraform.tfstate")
-
-	// Check if state file exists (might be in remote backend)
+	// Find tfstate file - check ModulePath first (where terraform actually runs)
+	// then fallback to workspace.Path (backward compatibility)
+	tfstatePath := filepath.Join(workspace.ModulePath, "terraform.tfstate")
 	if _, err := os.Stat(tfstatePath); os.IsNotExist(err) {
-		// Try to pull state from backend
-		e.logger.Debug("Local tfstate not found, attempting to pull from backend", "job_id", job.ID)
-		// For remote backends, we'd need to run 'terraform state pull'
-		// For now, skip state tracking if local state doesn't exist
-		if !suppressOutput {
-			e.logger.Info("State tracking skipped (remote backend)", "job_id", job.ID)
+		// Not found in ModulePath, check workspace.Path
+		altPath := filepath.Join(workspace.Path, "terraform.tfstate")
+		if _, err := os.Stat(altPath); err == nil {
+			tfstatePath = altPath
+		} else {
+			// Local tfstate not found in either location
+			e.logger.Debug("Local tfstate not found in module path or workspace path",
+				"job_id", job.ID,
+				"module_path", workspace.ModulePath,
+				"workspace_path", workspace.Path)
+
+			// Check if we have a remote backend configured
+			if workspace.Backend != nil && workspace.Backend.Type != "local" {
+				e.logger.Info("Attempting to pull state from remote backend",
+					"job_id", job.ID,
+					"backend_type", workspace.Backend.Type)
+
+				// Pull remote state to a temporary file
+				pulledStatePath, err := e.pullRemoteState(job, workspace)
+				if err != nil {
+					e.logger.Warn("Failed to pull remote state", "job_id", job.ID, "error", err)
+					return
+				}
+
+				// Use the pulled state file
+				tfstatePath = pulledStatePath
+
+				// Clean up temp file after we're done (defer wouldn't work well here as we need it for CaptureState)
+				defer func() {
+					if err := os.Remove(pulledStatePath); err != nil {
+						e.logger.Warn("Failed to remove temporary state file", "path", pulledStatePath, "error", err)
+					}
+				}()
+			} else {
+				// No local state and no remote backend - skip tracking
+				if !suppressOutput {
+					e.logger.Info("State tracking skipped (local state not found and no remote backend)", "job_id", job.ID)
+				}
+				return
+			}
 		}
-		return
 	}
 
 	// Capture state snapshot and track changes
@@ -1100,6 +1171,54 @@ func (e *TerraformExecutor) captureStateAfterApply(job *ExecutionJob, workspace 
 		EventType: "state_captured",
 		Progress:  fmt.Sprintf("State v%d captured (%d resources, %d changes)", snapshot.Version, len(snapshot.Resources), len(changes)),
 	})
+}
+
+// pullRemoteState pulls the current state from a remote backend to a temporary file
+func (e *TerraformExecutor) pullRemoteState(job *ExecutionJob, workspace *Workspace) (string, error) {
+	// Create a temporary file for the state
+	tmpFile, err := os.CreateTemp(workspace.TempDir, "remote-state-*.json")
+	if err != nil {
+		return "", fmt.Errorf("failed to create temp file for remote state: %w", err)
+	}
+	tmpPath := tmpFile.Name()
+	tmpFile.Close() // Close immediately, we'll write to it via stdout redirection or just let terraform write to stdout and we capture it
+
+	// Prepare command: terraform state pull
+	// Note: 'terraform state pull' writes to stdout
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
+	defer cancel()
+
+	args := []string{"state", "pull"}
+
+	// Add variables just in case backend config uses them (though usually not needed for state pull if init was done)
+	if err := e.addVariableArgs(&args, workspace); err != nil {
+		return "", fmt.Errorf("failed to add variables: %w", err)
+	}
+
+	cmd := exec.CommandContext(ctx, "terraform", args...)
+	cmd.Dir = workspace.ModulePath
+	cmd.Env = e.buildEnvironment(workspace)
+
+	// Capture stdout to file
+	outfile, err := os.Create(tmpPath)
+	if err != nil {
+		return "", fmt.Errorf("failed to open temp file for writing: %w", err)
+	}
+	defer outfile.Close()
+
+	cmd.Stdout = outfile
+
+	// Capture stderr for error reporting
+	var stderr strings.Builder
+	cmd.Stderr = &stderr
+
+	e.logger.Debug("Running terraform state pull", "job_id", job.ID)
+
+	if err := cmd.Run(); err != nil {
+		return "", fmt.Errorf("terraform state pull failed: %w (stderr: %s)", err, stderr.String())
+	}
+
+	return tmpPath, nil
 }
 
 // detectDriftBeforePlan detects drift and includes it in plan output
@@ -1423,9 +1542,10 @@ func (e *TerraformExecutor) saveJobMetadata(job *ExecutionJob, workspace *Worksp
 		metadata.DurationSeconds = job.EndTime.Sub(*job.StartTime).Seconds()
 	}
 
-	// Add backend type if available
+	// Add backend type and config if available
 	if workspace.Backend != nil {
 		metadata.BackendType = workspace.Backend.Type
+		metadata.BackendConfig = workspace.Backend
 	}
 
 	// Add artifact paths

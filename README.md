@@ -98,7 +98,7 @@ tfpipboy --operation destroy --targets networking,database
 
 ## Status
 
-**Current Version**: v0.6.2-pre  
+**Current Version**: v0.7.0-beta.1  
 **Status**: Core features complete, CI/CD stabilized, preparing for v1.0 release
 
 ### What's Implemented ✅
@@ -246,6 +246,9 @@ tfpipboy --operation apply --targets-all --concurrent 10
 
 # Verbose logging
 tfpipboy --operation plan --targets-all --verbose
+
+# Manually track state (capture current state without changes)
+tfpipboy --state-track --targets networking
 ```
 
 ---
