@@ -155,7 +155,9 @@ type ExecutionJob struct {
 	Duration        time.Duration          `yaml:"duration"`
 	Output          string                 `yaml:"output,omitempty"`
 	Error           string                 `yaml:"error,omitempty"`
-	PlanResult      string                 `yaml:"plan_result,omitempty"` // Plan result summary (e.g., "No changes", "+3 ~2 -1")
+	// Artifacts tracks generated artifacts (e.g. state keys) during execution
+	Artifacts  map[string]string `yaml:"artifacts,omitempty"`
+	PlanResult string            `yaml:"plan_result,omitempty"` // Plan result summary (e.g., "No changes", "+3 ~2 -1")
 }
 
 // JobStatus represents the status of an execution job
