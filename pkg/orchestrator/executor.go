@@ -61,6 +61,11 @@ func (e *TerraformExecutor) SetTimeout(timeout time.Duration) {
 	e.timeout = timeout
 }
 
+// SetStateManager sets the state manager (useful for testing injection)
+func (e *TerraformExecutor) SetStateManager(sm *state.Manager) {
+	e.stateManager = sm
+}
+
 // SetDryRun sets dry run mode
 func (e *TerraformExecutor) SetDryRun(dryRun bool) {
 	e.dryRun = dryRun
@@ -1153,6 +1158,21 @@ func (e *TerraformExecutor) captureStateAfterApply(job *ExecutionJob, workspace 
 			"resources", len(snapshot.Resources),
 			"changes", len(changes))
 
+		// ADDED: Record state artifact path
+		if job.Artifacts == nil {
+			job.Artifacts = make(map[string]string)
+		}
+
+		// The state manager saves snapshots to .tfpipboy/state-tracking/snapshots/<job_id>/latest.json
+		// We verify this file exists and add it to artifacts
+		// Note: We use absolute path for predictability
+		if absBase, err := filepath.Abs(".tfpipboy"); err == nil {
+			snapshotPath := filepath.Join(absBase, "state-tracking", "snapshots", job.ID, "latest.json")
+			if _, err := os.Stat(snapshotPath); err == nil {
+				job.Artifacts["tfstate"] = snapshotPath
+			}
+		}
+
 		// Log changes
 		if len(changes) > 0 {
 			e.logger.Info("State changes detected:", "job_id", job.ID)
@@ -1535,6 +1555,13 @@ func (e *TerraformExecutor) saveJobMetadata(job *ExecutionJob, workspace *Worksp
 		ExitCode:       exitCode,
 		ModulePath:     workspace.ModulePath,
 		Artifacts:      make(map[string]string),
+	}
+
+	// Copy existing artifacts from job
+	if job.Artifacts != nil {
+		for k, v := range job.Artifacts {
+			metadata.Artifacts[k] = v
+		}
 	}
 
 	// Calculate duration
