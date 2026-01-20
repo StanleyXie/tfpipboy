@@ -33,8 +33,8 @@ Design a comprehensive, DRY (Don't Repeat Yourself) configuration format for tfp
 **Before (HCL):**
 ```hcl
 # 11 modules × 8 lines each = 88 lines
-tenant_id            = "c3310862-..."
-subscription_id      = "4b05673b-..."
+tenant_id            = "xxxxxxxx-xxx"
+subscription_id      = "xxxxxxxx-001"
 resource_group_name  = "rg-exp-bootstrap-tfbackend"
 storage_account_name = "stexptfbackendbootstrap"
 container_name       = "platform"
@@ -94,7 +94,7 @@ vending:
 landing_zones:
   connectivity:
     subscriptions:
-      exp: "e786a45d-030c-4dfb-a827-fd18444ed496"
+      exp: "xxxxxxxx-xxxx-4xxx-xxxx-000000000004"
     backend:
       storage_account: "st${org_name}conn${environment}${location_slug}base"
     network:
@@ -183,7 +183,7 @@ pipelines:
 | vending | 2 | bootstrap | Subscription provisioning |
 | baseline | 2 | bootstrap | Resource groups, storage, network baseline |
 
-**State storage:** Bootstrap subscription (`4b05673b-...`) → `platform` container
+**State storage:** Bootstrap subscription (`xxxxxxxx-001`) → `platform` container
 
 ### Landing Zone Tier (Per-LZ Backend)
 
@@ -239,7 +239,7 @@ ${landing_zones.connectivity.vpn_config.exp.azure_vgw_sku}
 environments:
   exp:
     bootstrap:
-      subscription_id: "4b05673b-..."  # Dev bootstrap
+      subscription_id: "xxxxxxxx-001"  # Dev bootstrap
     firewall_config:
       sku_tier: "Standard"
     terraform:
@@ -247,7 +247,7 @@ environments:
   
   prod:
     bootstrap:
-      subscription_id: "9fd0d299-..."  # Prod bootstrap
+      subscription_id: "xxxxxxxx-005"  # Prod bootstrap
     firewall_config:
       sku_tier: "Premium"
     terraform:
@@ -287,7 +287,7 @@ modules:
 modules:
   core:
     backend:
-      subscription_id: "4b05673b-..."  # Duplicated
+      subscription_id: "xxxxxxxx-001"  # Duplicated
       resource_group: "rg-..."          # Duplicated
 ```
 

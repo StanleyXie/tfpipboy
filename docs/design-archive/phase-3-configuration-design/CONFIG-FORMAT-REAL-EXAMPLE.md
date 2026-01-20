@@ -19,7 +19,7 @@ version: "1.0"
 
 variables:
   # Azure Tenant
-  tenant_id: "c3310862-ab75-4bc6-b8b6-26a14539537c"
+  tenant_id: "xxxxxxxx-xxxx-4xxx-xxxx-xxxxxxxxxxxx"
   
   # Project Metadata
   project: "atlz-platform"
@@ -38,7 +38,7 @@ variables:
   
   # Billing
   billing:
-    account_id: "bca92218-bdfe-407e-b2c0-02ef02b3b6f8:333013a0-57ae-4229-82b3-b3cd70239eb2_2019-05-31"
+    account_id: "xxxxxxxx-xxxx-4xxx-xxxx-000000000002:xxxxxxxx-xxxx-4xxx-xxxx-000000000003_2019-05-31"
     profile_id: "XU5N-S6UC-BG7-PGB"
     use_profile_scope: true
     role_definition_id: "/providers/Microsoft.Billing/billingAccounts/..."
@@ -48,7 +48,7 @@ variables:
   
   # Bootstrap Backend (exp environment)
   bootstrap:
-    subscription_id: "4b05673b-62ce-4723-99fa-c1030624561e"
+    subscription_id: "xxxxxxxx-xxxx-4xxx-xxxx-000000000001"
     resource_group: "rg-exp-bootstrap-tfbackend"
     storage_account: "stexptfbackendbootstrap"
     container_name: "platform"
@@ -61,7 +61,7 @@ environments:
     org_name: "explz"
     
     bootstrap:
-      subscription_id: "4b05673b-62ce-4723-99fa-c1030624561e"
+      subscription_id: "xxxxxxxx-xxxx-4xxx-xxxx-000000000001"
       resource_group: "rg-exp-bootstrap-tfbackend"
       storage_account: "stexptfbackendbootstrap"
       container_name: "platform"
@@ -81,7 +81,7 @@ environments:
     org_name: "atlz"
     
     bootstrap:
-      subscription_id: "9fd0d299-f872-47d2-b400-91d27060b5d1"
+      subscription_id: "xxxxxxxx-xxxx-4xxx-xxxx-000000000005"
       resource_group: "rg-atlz-bs-main-gc-base"
       storage_account: "statlzbsmaingcbase"
       container_name: "tfstate"
@@ -121,10 +121,10 @@ landing_zones:
     
     # Subscriptions per environment
     subscriptions:
-      exp: "e786a45d-030c-4dfb-a827-fd18444ed496"
-      dev: "e786a45d-030c-4dfb-a827-fd18444ed496"
-      main: "f4c8307d-44ec-415d-81fe-6767e3679d29"
-      prod: "f4c8307d-44ec-415d-81fe-6767e3679d29"
+      exp: "xxxxxxxx-xxxx-4xxx-xxxx-000000000004"
+      dev: "xxxxxxxx-xxxx-4xxx-xxxx-000000000004"
+      main: "xxxxxxxx-xxxx-4xxx-xxxx-000000000006"
+      prod: "xxxxxxxx-xxxx-4xxx-xxxx-000000000006"
     
     # Backend for connectivity modules
     backend:
@@ -180,10 +180,10 @@ landing_zones:
     repo_name: "atlz-platform"
     
     subscriptions:
-      exp: "57ddcee2-0c0c-4b3f-90be-b3b222fd8d9a"
-      dev: "57ddcee2-0c0c-4b3f-90be-b3b222fd8d9a"
-      main: "4c89f399-7da6-4a53-baf5-3bffe373d6c0"
-      prod: "4c89f399-7da6-4a53-baf5-3bffe373d6c0"
+      exp: "xxxxxxxx-xxxx-4xxx-xxxx-000000000007"
+      dev: "xxxxxxxx-xxxx-4xxx-xxxx-000000000007"
+      main: "xxxxxxxx-xxxx-4xxx-xxxx-000000000008"
+      prod: "xxxxxxxx-xxxx-4xxx-xxxx-000000000008"
     
     backend:
       resource_group: "rg-${org_name}-mgmt-${environment}-${location_slug}-base"
@@ -199,7 +199,7 @@ landing_zones:
         main: ["10.180.212.0/25"]
         prod: ["10.180.213.0/25"]
       hub_vnet_id:
-        exp: "/subscriptions/e786a45d-030c-4dfb-a827-fd18444ed496/resourceGroups/rg-explz-conn-dev-gc-hub/providers/Microsoft.Network/virtualNetworks/vnet-explz-conn-dev-gc-hub"
+        exp: "/subscriptions/xxxxxxxx-xxxx-4xxx-xxxx-000000000004/resourceGroups/rg-explz-conn-dev-gc-hub/providers/Microsoft.Network/virtualNetworks/vnet-explz-conn-dev-gc-hub"
         # ... other environments
     
     storage_account_settings:
@@ -721,7 +721,7 @@ vending:
 landing_zones:
   connectivity:
     subscriptions:
-      exp: "e786a45d-..."
+      exp: "xxxxxxxx-004"
     backend:
       storage_account: "st${org_name}conn${environment}${location_slug}base"
 ```

@@ -19,8 +19,8 @@ Each module had its own backend configuration file (`.env/{environment}/backend.
 
 **File: `plz/core/.env/exp/backend.hcl` (8 lines)**
 ```hcl
-tenant_id            = "c3310862-ab75-4bc6-b8b6-26a14539537c"
-subscription_id      = "4b05673b-62ce-4723-99fa-c1030624561e"
+tenant_id            = "xxxxxxxx-xxxx-4xxx-xxxx-xxxxxxxxxxxx"
+subscription_id      = "xxxxxxxx-xxxx-4xxx-xxxx-000000000001"
 resource_group_name  = "rg-exp-bootstrap-tfbackend"
 storage_account_name = "stexptfbackendbootstrap"
 container_name       = "platform"
@@ -30,8 +30,8 @@ use_azuread_auth     = true
 
 **File: `plz/bootstrap/vending/.env/exp/backend.hcl` (8 lines)**
 ```hcl
-tenant_id            = "c3310862-ab75-4bc6-b8b6-26a14539537c"  # ← DUPLICATE
-subscription_id      = "4b05673b-62ce-4723-99fa-c1030624561e"  # ← DUPLICATE
+tenant_id            = "xxxxxxxx-xxxx-4xxx-xxxx-xxxxxxxxxxxx"  # ← DUPLICATE
+subscription_id      = "xxxxxxxx-xxxx-4xxx-xxxx-000000000001"  # ← DUPLICATE
 resource_group_name  = "rg-exp-bootstrap-tfbackend"            # ← DUPLICATE
 storage_account_name = "stexptfbackendbootstrap"               # ← DUPLICATE
 container_name       = "platform"                              # ← DUPLICATE
@@ -87,7 +87,7 @@ github_org_name    = "WITT-AZURE-PLATFORM"
 location           = "germanywestcentral"
 location_slug      = "gc"
 billing_profile_id = "XU5N-S6UC-BG7-PGB"
-billing_account_id = "bca92218-bdfe-407e-b2c0-02ef02b3b6f8:..."
+billing_account_id = "xxxxxxxx-xxxx-4xxx-xxxx-000000000002:..."
 ...
 ```
 
@@ -98,7 +98,7 @@ github_org_name    = "WITT-AZURE-PLATFORM"  # ← DUPLICATE
 location           = "germanywestcentral"  # ← DUPLICATE
 location_slug      = "gc"  # ← DUPLICATE
 billing_profile_id = "XU5N-S6UC-BG7-PGB"  # ← DUPLICATE
-billing_account_id = "bca92218-bdfe-407e-b2c0-02ef02b3b6f8:..."  # ← DUPLICATE
+billing_account_id = "xxxxxxxx-xxxx-4xxx-xxxx-000000000002:..."  # ← DUPLICATE
 landing_zones = {
   connectivity = {
     workload_type = "Production"
@@ -122,7 +122,7 @@ version: "1.0"
 
 variables:
   # Define once
-  tenant_id: "c3310862-ab75-4bc6-b8b6-26a14539537c"
+  tenant_id: "xxxxxxxx-xxxx-4xxx-xxxx-xxxxxxxxxxxx"
   root_id: "exp"
   root_name: "ExperimentDev-Stanley"
   github:
@@ -131,7 +131,7 @@ variables:
   location: "germanywestcentral"
   location_slug: "gc"
   billing:
-    account_id: "bca92218-bdfe-407e-b2c0-02ef02b3b6f8:..."
+    account_id: "xxxxxxxx-xxxx-4xxx-xxxx-000000000002:..."
     profile_id: "XU5N-S6UC-BG7-PGB"
   
   # Landing zone configs moved to landing-zones.yaml
@@ -219,8 +219,8 @@ landing_zones:
     archetype: "connectivity"
     
     subscriptions:
-      exp: "e786a45d-030c-4dfb-a827-fd18444ed496"
-      dev: "e786a45d-030c-4dfb-a827-fd18444ed496"
+      exp: "xxxxxxxx-xxxx-4xxx-xxxx-000000000004"
+      dev: "xxxxxxxx-xxxx-4xxx-xxxx-000000000004"
     
     backend:
       resource_group: "rg-${org_name}-conn-${environment}-${location_slug}-base"
@@ -253,8 +253,8 @@ modules = {
   core = {
     module_path = "source/root_modules/plz/core"
     backend_config = {
-      tenant_id            = "c3310862-..."
-      subscription_id      = "4b05673b-..."
+      tenant_id            = "xxxxxxxx-xxx"
+      subscription_id      = "xxxxxxxx-001"
       resource_group_name  = "rg-exp-bootstrap-tfbackend"
       storage_account_name = "stexptfbackendbootstrap"
       container_name       = "platform"
@@ -262,8 +262,8 @@ modules = {
       use_azuread_auth     = true
     }
     deploy_config = {
-      tf_backend_tenant_id = "c3310862-..."
-      tf_backend_subscription_id = "4b05673b-..."
+      tf_backend_tenant_id = "xxxxxxxx-xxx"
+      tf_backend_subscription_id = "xxxxxxxx-001"
       # ... more duplicated config
     }
     depends_on = []

@@ -44,6 +44,7 @@ func main() {
 		discover        = flag.String("discover", "", "Discover Terraform modules in specified path and generate configuration")
 		discoverOutput  = flag.String("discover-output", "", "Output file for discovered configuration (default: stdout)")
 		initWorkdir     = flag.Bool("init-workdir", false, "Initialize tfpipboy working directory with default structure")
+		stateTrack      = flag.Bool("state-track", false, "Manually trigger state tracking for targets")
 		showHelp        = flag.Bool("help", false, "Show help message")
 		showVersion     = flag.Bool("version", false, "Show version")
 	)
@@ -251,6 +252,9 @@ func main() {
 		}
 
 		op := orchestrator.TerraformOperation(*operation)
+		if *stateTrack {
+			op = orchestrator.OpStateTrack
+		}
 		logger.Info("Executing operation", "operation", op, "targets", targetList, "environment", *environment)
 
 		plan, err := orch.PlanExecution(op, targetList, *environment)

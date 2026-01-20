@@ -167,7 +167,7 @@ variables:
   environment: "dev"
   
   # Azure tenant
-  tenant_id: "c3310862-ab75-4bc6-b8b6-26a14539537c"
+  tenant_id: "xxxxxxxx-xxxx-4xxx-xxxx-xxxxxxxxxxxx"
   
   # Location settings
   location: "germanywestcentral"
@@ -178,12 +178,12 @@ variables:
   github_org_name: "WITT-AZURE-PLATFORM"
   
   # Billing
-  billing_account_id: "bca92218-bdfe-407e-b2c0-02ef02b3b6f8:333013a0-57ae-4229-82b3-b3cd70239eb2_2019-05-31"
+  billing_account_id: "xxxxxxxx-xxxx-4xxx-xxxx-000000000002:xxxxxxxx-xxxx-4xxx-xxxx-000000000003_2019-05-31"
   billing_profile_id: "XU5N-S6UC-BG7-PGB"
   
   # Bootstrap subscription (for state storage)
   bootstrap:
-    subscription_id: "4b05673b-62ce-4723-99fa-c1030624561e"
+    subscription_id: "xxxxxxxx-xxxx-4xxx-xxxx-000000000001"
     resource_group: "rg-exp-bootstrap-tfbackend"
     storage_account: "stexptfbackendbootstrap"
   
@@ -255,7 +255,7 @@ landing_zones:
     
     # Subscription per environment
     subscriptions:
-      dev: "e786a45d-030c-4dfb-a827-fd18444ed496"
+      dev: "xxxxxxxx-xxxx-4xxx-xxxx-000000000004"
     
     # Storage settings
     storage:
@@ -282,7 +282,7 @@ landing_zones:
       enable_default_subnet: true
       address_spaces:
         dev: ["10.200.212.0/25"]
-      hub_vnet_id: "/subscriptions/e786a45d-030c-4dfb-a827-fd18444ed496/resourceGroups/rg-explz-conn-dev-gc-hub/providers/Microsoft.Network/virtualNetworks/vnet-explz-conn-dev-gc-hub"
+      hub_vnet_id: "/subscriptions/xxxxxxxx-xxxx-4xxx-xxxx-000000000004/resourceGroups/rg-explz-conn-dev-gc-hub/providers/Microsoft.Network/virtualNetworks/vnet-explz-conn-dev-gc-hub"
     
     # Subscription per environment
     subscriptions:
