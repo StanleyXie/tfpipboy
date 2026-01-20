@@ -84,19 +84,19 @@ variables:
   root_name: "ExperimentDev"
   
   # Azure configuration
-  tenant_id: "c3310862-ab75-4bc6-b8b6-26a14539537c"
+  tenant_id: "xxxxxxxx-xxxx-4xxx-xxxx-xxxxxxxxxxxx"
   location: "germanywestcentral"
   location_slug: "gc"
   org_name: "explz"
   
   # Bootstrap backend
   bootstrap:
-    subscription_id: "4b05673b-62ce-4723-99fa-c1030624561e"
+    subscription_id: "xxxxxxxx-xxxx-4xxx-xxxx-000000000001"
     resource_group: "rg-exp-bootstrap-tfbackend"
     storage_account: "stexptfbackendbootstrap"
   
   # Billing
-  billing_account_id: "bca92218-bdfe-407e-b2c0-02ef02b3b6f8:333013a0-..."
+  billing_account_id: "xxxxxxxx-xxxx-4xxx-xxxx-000000000002:333013a0-..."
   billing_profile_id: "XU5N-S6UC-BG7-PGB"
   
   # Naming conventions
@@ -314,8 +314,8 @@ landing_zones:
         dev: "/subscriptions/.../vnet-explz-conn-dev-gc-hub"
     
     subscriptions:
-      dev: "e786a45d-030c-4dfb-a827-fd18444ed496"
-      exp: "e786a45d-030c-4dfb-a827-fd18444ed496"
+      dev: "xxxxxxxx-xxxx-4xxx-xxxx-000000000004"
+      exp: "xxxxxxxx-xxxx-4xxx-xxxx-000000000004"
       prod: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
     
     backend:

@@ -62,7 +62,7 @@ modules:
       json:
         environment: "production"
         location: "germanywestcentral"
-        subscription_id: "9fd0d299-f872-47d2-b400-91d27060b5d1"
+        subscription_id: "xxxxxxxx-xxxx-4xxx-xxxx-000000000005"
 ```
 
 **Terraform command generated:**
@@ -71,7 +71,7 @@ terraform plan \
   -var-file=/path/to/workspace/terraform.tfvars \
   -var=environment=production \
   -var=location=germanywestcentral \
-  -var=subscription_id=9fd0d299-f872-47d2-b400-91d27060b5d1
+  -var=subscription_id=xxxxxxxx-xxxx-4xxx-xxxx-000000000005
 ```
 
 ### Example 4: Multiple Files + Inline Variables
@@ -110,7 +110,7 @@ modules:
       vars:
         environment: "production"
         location: "germanywestcentral"
-        subscription_id: "9fd0d299-f872-47d2-b400-91d27060b5d1"
+        subscription_id: "xxxxxxxx-xxxx-4xxx-xxxx-000000000005"
         tags:
           project: "landing-zone"
           managed_by: "tfpipboy"
@@ -121,7 +121,7 @@ modules:
 terraform plan \
   -var=environment=production \
   -var=location=germanywestcentral \
-  -var=subscription_id=9fd0d299-f872-47d2-b400-91d27060b5d1 \
+  -var=subscription_id=xxxxxxxx-xxxx-4xxx-xxxx-000000000005 \
   -var=tags=map[managed_by:tfpipboy project:landing-zone]
 ```
 
