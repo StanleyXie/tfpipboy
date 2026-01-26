@@ -138,7 +138,7 @@ jobs:
 
       - name: Upload security report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: gosec-report
           path: gosec-report.json
@@ -201,7 +201,7 @@ jobs:
           fi
 
       - name: Upload build artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: tfpipboy-${{ matrix.os }}-${{ matrix.go-version }}
           path: bin/tfpipboy${{ matrix.os == 'windows-latest' && '.exe' || '' }}
@@ -269,7 +269,7 @@ jobs:
 
       - name: Upload integration test logs
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: integration-test-logs
           path: /tmp/tfpipboy-*.log
@@ -336,7 +336,7 @@ jobs:
 
       - name: Upload e2e test logs
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: e2e-test-logs
           path: /tmp/e2e-*.log
